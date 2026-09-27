@@ -21,7 +21,7 @@
       <span><b>MBG-BIOLOOP</b><small id="siteName">SPPG Contoh</small></span>
     </a>
     <nav class="links" aria-label="Navigasi utama">
-      <a href="#cara-kerja">Cara kerja</a><a href="#dasbor">Dasbor</a><a href="#data">Data &amp; bukti</a><a href="#panduan">Panduan</a>
+      <a href="#cara-kerja">Cara kerja</a><a href="#dasbor">Pantau</a><a href="#data">Data &amp; bukti</a><a href="#panduan">Bantuan</a>
     </nav>
     <div class="nav-right">
       <span class="conn" id="conn" title="Status koneksi server"><i></i><span>Menghubungkan…</span></span>
@@ -43,7 +43,7 @@
       <h1>Sisa makan siang hari ini, api dapur SPPG esok pagi.</h1>
       <p class="lede">MBG-BIOLOOP mengolah sisa pangan program Makan Bergizi Gratis menjadi biogas untuk kompor dapur SPPG dan pupuk untuk kebun sekolah. Sensor menjaga reaktor, AI membaca pola sisa makanan, dan Telegram mengabari petugas.</p>
       <div class="cta">
-        <a class="btn btn-gold" href="#dasbor">Buka dasbor langsung</a>
+        <a class="btn btn-gold" href="#dasbor">Pantau reaktor sekarang</a>
         <button class="btn btn-ghost" data-open-chat>Ngobrol dengan asisten AI</button>
       </div>
       <dl class="facts">
@@ -83,17 +83,17 @@
 <section class="sec sec-dash" id="dasbor">
   <div class="wrap">
     <div class="dash-head">
-      <div><h2>Dasbor bioreaktor</h2><p class="muted" id="modeNote">Menghubungkan ke server…</p></div>
+      <div><h2>Pantau bioreaktor</h2><p class="muted" id="modeNote">Menghubungkan ke server…</p></div>
       <div class="dash-tools">
         <label class="speed" id="sourceWrap" hidden>Sumber
           <select id="source" aria-label="Sumber data"></select></label>
         <span class="clock" id="clock">Hari 1, 08.00</span>
         <span class="health" id="health"><i></i><span>Proses stabil</span></span>
-        <label class="speed">Kecepatan
+        <label class="speed only-admin" id="speedWrap" hidden>Kecepatan
           <select id="speed" aria-label="Kecepatan simulasi">
             <option value="1">1× nyata</option><option value="60">1 menit/detik</option><option value="600">10 menit/detik</option><option value="3600">1 jam/detik</option>
           </select></label>
-        <button class="btn btn-line sm" id="pause">Jeda</button>
+        <button class="btn btn-line sm only-admin" id="pause" hidden>Jeda</button>
       </div>
     </div>
 
@@ -118,16 +118,16 @@
 
       <aside class="panel">
         <div class="tabs" role="tablist">
-          <button role="tab" aria-selected="true" data-tab="kendali">Kendali</button>
-          <button role="tab" aria-selected="false" data-tab="grafik">Grafik</button>
-          <button role="tab" aria-selected="false" data-tab="sisa">Sisa</button>
-          <button role="tab" aria-selected="false" data-tab="kalk">Kalkulator</button>
+          <button role="tab" aria-selected="true" data-tab="grafik">Grafik</button>
+          <button role="tab" aria-selected="false" data-tab="sisa">Sisa pangan</button>
           <button role="tab" aria-selected="false" data-tab="log">Catatan</button>
-          <button role="tab" aria-selected="false" data-tab="tele">Telegram</button>
+          <button role="tab" aria-selected="false" data-tab="tele">Notifikasi</button>
+          <button role="tab" aria-selected="false" data-tab="kalk">Kalkulator</button>
+          <button role="tab" aria-selected="false" data-tab="kendali" id="tabBtnKendali" hidden>Kendali</button>
         </div>
         <div class="tabc">
           <!-- KENDALI -->
-          <div class="tab on" id="tab-kendali" role="tabpanel">
+          <div class="tab" id="tab-kendali" role="tabpanel">
             <div class="ctl"><div><b>Mode otomatis</b><span>Kontroler mengatur suhu, buffer, dan gas surplus</span></div><button class="sw" id="swAuto" role="switch" aria-checked="true" aria-label="Mode otomatis"></button></div>
             <div class="ctl"><div><b>Air panas ke koil</b><span>Menaikkan suhu lewat konduksi dinding selang</span></div><button class="sw hot" id="swHot" role="switch" aria-checked="false" aria-label="Air panas"></button></div>
             <div class="ctl"><div><b>Air dingin ke koil</b><span>Menurunkan suhu saat terik</span></div><button class="sw cold" id="swCold" role="switch" aria-checked="false" aria-label="Air dingin"></button></div>
@@ -144,7 +144,8 @@
             <h4>Jadwal harian</h4>
             <label class="chk"><input type="checkbox" id="schFeed" checked> Umpan otomatis pukul 14.00 dari sisa makan siang</label>
             <label class="chk"><input type="checkbox" id="schStove" checked> Kompor 05.00–05.40, 10.00–10.15, 17.00–17.15</label>
-            <h4>Uji gangguan <small>(mode simulasi)</small></h4>
+            <div class="only-admin" id="adminTest" hidden>
+            <h4>Uji gangguan <small>(khusus admin, mode simulasi)</small></h4>
             <div class="scen">
               <button data-sc="cold">Malam dingin<span>udara −10 °C, 12 jam</span></button>
               <button data-sc="hot">Terik ekstrem<span>matahari 8 jam</span></button>
@@ -158,9 +159,10 @@
             <div class="scen fix">
               <button data-sc="fixleak">Perbaiki bocor</button><button data-sc="fixheat">Perbaiki pemanas</button><button data-sc="fixscrub">Ganti media</button><button id="btnReset" class="danger">Mulai ulang</button>
             </div>
+            </div>
           </div>
           <!-- GRAFIK -->
-          <div class="tab" id="tab-grafik" role="tabpanel">
+          <div class="tab on" id="tab-grafik" role="tabpanel">
             <label class="lbl-sel">Tampilkan<select id="chartSel" class="sel">
               <option value="T">Suhu slurry (°C)</option><option value="pH">pH</option><option value="vfa">VFA (mg/L)</option><option value="P">Tekanan gas (mbar)</option>
               <option value="Vg">Isi drum gas (%)</option><option value="prod">Produksi biogas (m³/hari)</option><option value="x">Kadar metana (%)</option><option value="sl">Endapan (L)</option></select></label>
@@ -202,20 +204,20 @@
           <!-- TELEGRAM -->
           <div class="tab" id="tab-tele" role="tabpanel">
             <div id="teleStatus" class="tele-card"></div>
-            <h4>Yang bisa dilakukan bot</h4>
-            <ul class="plain">
-              <li>Menjawab pertanyaan biasa dengan Gemini dan mengingat obrolan sebelumnya</li>
-              <li>Mengirim peringatan saat suhu, pH, tekanan, atau kebocoran tidak normal</li>
-              <li>Menjalankan perintah: <code>/status</code>, <code>/kompor_on</code>, <code>/buffer 300</code>, <code>/kuras 20</code></li>
-              <li>Menunjukkan apa yang diingat: <code>/ingatan</code>; menghapus: <code>/lupa</code></li>
-            </ul>
-            <h4>Cara bergabung</h4>
+            <h4 class="first">Dapat peringatan di HP</h4>
             <ol class="plain">
-              <li>Buka bot di Telegram lalu tekan <b>Start</b>.</li>
-              <li>Bot membalas "menunggu persetujuan admin".</li>
-              <li>Setelah admin menyetujui di panel admin, ketik <code>/start</code> lagi.</li>
+              <li>Klik tombol <b>Buka bot Telegram</b> di atas, lalu tekan <b>Start</b>.</li>
+              <li>Bot membalas "menunggu persetujuan". Admin SPPG akan menyetujui chat Anda.</li>
+              <li>Setelah disetujui, ketik <code>/start</code>. Peringatan suhu, pH, kebocoran gas, dan laporan harian akan masuk otomatis.</li>
             </ol>
-            <div id="teleAdmin" hidden><a class="btn btn-line sm" href="admin.html#telegram">Kelola chat Telegram di panel admin →</a></div>
+            <h4>Yang bisa ditanyakan ke bot</h4>
+            <ul class="plain">
+              <li><code>/status</code> kondisi reaktor sekarang</li>
+              <li><code>/laporan</code> biogas, LPG, dan penghematan hari ini</li>
+              <li><code>/peringatan</code> peringatan yang sedang aktif</li>
+              <li>Pertanyaan biasa, misalnya "kenapa pH turun?". Asisten AI menjawab dan mengingat obrolan.</li>
+            </ul>
+            <div id="teleAdmin" hidden><a class="btn btn-line sm" href="admin.html#telegram">Kelola chat & notifikasi di panel admin →</a></div>
           </div>
         </div>
       </aside>
@@ -235,21 +237,21 @@
       <article><h3>Satu SPPG penuh</h3><p class="big">±13 m³</p><p>volume digester untuk sisa ±120 kg/hari dari 2.500 porsi, setara ±7 kg LPG per hari. Modul 500 L cocok untuk percontohan.</p><cite>Perhitungan model, lihat sheet Perhitungan</cite></article>
       <article><h3>Pupuk yang aman</h3><p class="big">Wajib kering</p><p>digesti mesofilik menurunkan patogen tetapi tidak menghilangkannya. Endapan dikeringkan atau dikomposkan sebelum dipakai.</p><cite>Machnicka &amp; Grübel, ESPR 2023</cite></article>
     </div>
-    <div class="dl"><a class="btn btn-merah" href="docs/Data_Penelitian_MBG_BIOLOOP.xlsx" download>Unduh data penelitian (Excel)</a><button class="btn btn-line" data-doc="ARSITEKTUR.md">Lihat arsitektur sistem</button></div>
+    <div class="dl"><a class="btn btn-merah" href="docs/Data_Penelitian_MBG_BIOLOOP.xlsx" download>Unduh data penelitian (Excel)</a><button class="btn btn-line" data-doc="PANDUAN_PENGGUNA.md">Cara membaca angka di dasbor</button></div>
   </div>
 </section>
 
-<!-- ================= PANDUAN ================= -->
+<!-- ================= BANTUAN ================= -->
 <section class="sec sec-guide" id="panduan">
   <div class="wrap">
-    <div class="sec-head"><h2>Online dalam empat langkah</h2><p>Tidak perlu jago pemrograman. Panduan lengkap menjelaskan setiap klik, dari GitHub sampai Telegram.</p></div>
+    <div class="sec-head"><h2>Siapa pun bisa ikut memantau</h2><p>Tidak perlu akun untuk melihat kondisi reaktor. Akun hanya dibutuhkan untuk petugas yang mengendalikan alat dan bertanya ke asisten AI.</p></div>
     <ol class="guide">
-      <li><b>Unggah ke GitHub</b><p>Buat repositori, unggah isi folder proyek lewat tombol <i>Add file → Upload files</i>.</p></li>
-      <li><b>Buat database Supabase</b><p>Proyek baru gratis, salin <i>connection string</i> mode <i>Transaction pooler</i>.</p></li>
-      <li><b>Impor ke Vercel</b><p>Pilih repositori GitHub, isi <code>DATABASE_URL</code>, token Telegram, dan key Gemini, lalu <i>Deploy</i>.</p></li>
-      <li><b>Masuk sebagai admin</b><p>Buka <code>/admin.html</code>, pasang webhook Telegram, daftarkan perangkat, ganti kata sandi.</p></li>
+      <li><b>Pantau tanpa akun</b><p>Buka bagian <a href="#dasbor">Pantau</a>. Angka suhu, pH, gas, dan grafik diperbarui tiap beberapa detik.</p></li>
+      <li><b>Terima peringatan</b><p>Hubungkan Telegram. Peringatan bahaya dan laporan harian masuk otomatis ke HP Anda.</p></li>
+      <li><b>Tanya asisten AI</b><p>Daftar atau masuk, lalu klik <i>Asisten AI</i>. Tanyakan apa saja tentang reaktor dengan bahasa sehari-hari.</p></li>
+      <li><b>Petugas SPPG</b><p>Masuk dengan akun petugas untuk menyalakan kompor, menambah buffer, atau menguras endapan.</p></li>
     </ol>
-    <div class="dl"><button class="btn btn-gold" data-doc="PANDUAN_DEPLOY_VERCEL.md">Panduan deploy (GitHub + Vercel)</button><button class="btn btn-line" data-doc="PANDUAN_PENGGUNAAN.md">Panduan pengguna &amp; admin</button><button class="btn btn-line" data-doc="PANDUAN_SETUP.md">Menjalankan di komputer sendiri</button><button class="btn btn-line" data-doc="PANDUAN_TERMINAL.md">Perintah terminal (tanpa .bat)</button></div>
+    <div class="dl"><a class="btn btn-gold" id="botLink" href="#" target="_blank" rel="noopener" hidden>Buka bot Telegram</a><button class="btn btn-line" id="helpLogin">Masuk / daftar akun</button><button class="btn btn-line" data-doc="PANDUAN_PENGGUNA.md">Panduan pengguna</button></div>
   </div>
 </section>
 </main>

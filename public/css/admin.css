@@ -137,3 +137,22 @@ table.t .mono { font-family: ui-monospace, Menlo, Consolas, monospace; font-size
   .sec-adm { display: block !important; }
   .sec-adm[hidden] { display: none !important; }
 }
+
+/* ----- siap dipakai, jadwal, panduan ----- */
+.card.ready { border-left: 4px solid var(--emas); }
+.card.ready.done { border-left-color: var(--ok); }
+.checklist li.opt::before { content: "–"; background: #C9CDD4; }
+.sch-list { display: grid; gap: 10px; margin-bottom: 12px; }
+.sch { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: flex-end; padding: 12px; border: 1px solid var(--garis); border-radius: 12px; background: #FCFAF6; }
+.sch label { display: flex; flex-direction: column; gap: 4px; font-size: .8rem; font-weight: 700; color: var(--abu); }
+.sch label.grow { flex: 1 1 240px; }
+.sch label.chk { flex-direction: row; align-items: center; gap: 6px; padding-bottom: 8px; color: var(--tinta); }
+.sch .full { flex-basis: 100%; }
+.sch .days { display: flex; gap: 3px; padding-bottom: 2px; flex-wrap: wrap; }
+.sch .days button { border: 1px solid var(--garis); background: #fff; border-radius: 8px; padding: 7px 8px; font-size: .78rem; font-weight: 700; color: var(--abu); cursor: pointer; }
+.sch .days button.on { background: var(--marun); border-color: var(--marun); color: #fff; }
+.sch [data-del] { margin-bottom: 4px; }
+.docgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.card.doc { text-align: left; cursor: pointer; display: flex; flex-direction: column; gap: 6px; font: inherit; color: inherit; margin: 0; }
+.card.doc:hover, .card.doc.on { border-color: var(--marun); box-shadow: 0 4px 14px rgba(122,16,32,.1); }
+#docView { max-width: 900px; }

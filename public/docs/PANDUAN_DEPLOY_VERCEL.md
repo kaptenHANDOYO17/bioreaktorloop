@@ -108,20 +108,28 @@ Tambahan opsional: `CRON_SECRET` (kata acak panjang), `SESSION_SECRET` (kata aca
 2. Masuk dengan:
    - Nama pengguna: **Handoyo**
    - Kata sandi: **12345**
-3. Sistem langsung meminta Anda **mengganti kata sandi**. Lakukan sekarang. Kata sandi `12345` sangat mudah ditebak siapa pun yang tahu alamat website Anda. Pakai minimal 8 karakter, misalnya gabungan 3–4 kata: `kompor-biru-sayur-2045`.
+3. Sistem meminta Anda **mengganti kata sandi**. Pakai minimal 8 karakter, misalnya gabungan 3–4 kata: `kompor-biru-sayur-2045`.
+
+**Ingin beberapa akun mudah sekaligus, atau lupa kata sandi?** Di terminal VS Code (file `.env` berisi `DATABASE_URL` yang sama dengan di Vercel):
+
+```
+npm install
+npm run akun -- awal
+```
+
+Perintah ini membuat/memulihkan `Handoyo/12345`, `admin/admin123` (admin), serta `petugas/petugas123`, `gizi/gizi123`, `guru/guru123` (pengguna). Rincian di **Menyelesaikan pemasangan** dan **Panduan admin**.
 
 Keamanan bawaan: akun terkunci 10 menit setelah 5 kali salah kata sandi, dan semua kata sandi disimpan dalam bentuk hash (tidak bisa dibaca, bahkan oleh admin).
 
 ## Langkah 6: Nyalakan bot Telegram
 
-1. Di panel admin buka menu **Telegram**.
-2. Pastikan alamat di kotak **Alamat website** adalah alamat produksi Anda (`https://…vercel.app`, bukan alamat preview yang panjang).
-3. Klik **Pasang webhook**. Status berubah hijau "Terpasang".
-4. Di Telegram, buka bot Anda → **Start**. Bot membalas "menunggu persetujuan admin".
-5. Kembali ke panel admin → **Telegram** → muat ulang halaman → klik **Setujui** pada chat Anda.
-6. Di Telegram ketik `/start` lalu `/status`. Coba tanya: *"kenapa pH bisa turun?"*
+1. Webhook dipasang **otomatis** oleh website. Cek di panel admin → **Telegram & notifikasi** → kotak **Webhook** hijau *Terpasang*. Bila belum, klik **Pasang otomatis**.
+2. Di Telegram, buka bot Anda → **Start**. Bot membalas "menunggu persetujuan admin".
+3. Kembali ke panel admin → muat ulang halaman → klik **Setujui** pada chat Anda.
+4. Di Telegram ketik `/status` dan `/laporan`. Coba tanya: *"kenapa pH bisa turun?"*
+5. Atur **Notifikasi otomatis**, **Kirim sekarang**, dan **Jadwal pesan** di menu yang sama (lihat Panduan admin).
 
-Ulangi langkah 4–5 untuk setiap petugas atau grup Telegram.
+Ulangi langkah 2–3 untuk setiap petugas atau grup Telegram. Lewat terminal: `npm run bot -- chat` lalu `npm run bot -- setujui <chat id>`.
 
 ## Langkah 7: Jadwal otomatis lewat GitHub Actions (disarankan)
 
@@ -179,10 +187,11 @@ Untuk operasional resmi di banyak SPPG, pertimbangkan paket berbayar agar lebih 
 | "Database tidak bisa dihubungi: password authentication failed" | Password di connection string salah atau masih `[YOUR-PASSWORD]` |
 | "…getaddrinfo ENOTFOUND…" atau timeout | Anda memakai *Direct connection*. Ganti ke **Transaction pooler** port 6543 |
 | Proyek Supabase "Paused" | Buka dasbor Supabase → **Restore project**. Pasang cron GitHub (langkah 7) agar tidak terulang |
-| Tidak bisa masuk `Handoyo`/`12345` | Kata sandi sudah pernah diganti. Admin lain bisa mereset di menu **Pengguna**. Bila tidak ada admin lain, lihat bagian *Lupa kata sandi admin* di Panduan penggunaan |
+| Tidak bisa masuk `Handoyo`/`12345` | Di terminal VS Code: `npm run akun -- sandi Handoyo 12345` (atau `npm run akun -- awal`). `.env` harus memakai `DATABASE_URL` yang sama dengan Vercel |
 | "Akun dikunci 10 menit" | 5 kali salah kata sandi. Tunggu 10 menit |
 | Bot tidak membalas | Panel admin → Telegram → pastikan webhook **Terpasang** dan chat Anda **Disetujui** |
-| Webhook error "wrong response 401" | Webhook dipasang dengan alamat lama/preview. Klik **Pasang ulang webhook** dengan alamat produksi |
+| Webhook error "wrong response 401" | Webhook dipasang dengan alamat lama/preview. Klik **Pasang otomatis** di menu Telegram & notifikasi |
+| Website lambat / sering "Mode demo" | Server Vercel jauh dari database. `vercel.json` sudah berisi `"regions": ["syd1"]` (Sydney, cocok untuk Supabase `ap-southeast-2`). Untuk Supabase Singapura ganti ke `sin1` |
 | Asisten menjawab "API key Gemini ditolak" | Kunci salah/terhapus. Buat baru di AI Studio, ganti di Vercel, Redeploy |
 | Asisten "Kuota Gemini sedang habis" | Batas tingkat gratis tercapai. Tunggu beberapa menit |
 | Workflow GitHub gagal (merah) | Secret `BIOLOOP_URL` salah ketik atau `CRON_SECRET` tidak sama dengan di Vercel |

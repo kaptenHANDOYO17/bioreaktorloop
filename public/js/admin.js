@@ -16,7 +16,7 @@ function ago(v) {
 }
 const LVL = { bad: 'Bahaya', warn: 'Waspada', ok: 'Pulih', info: 'Info' };
 const CAT = { alert: 'Peringatan', action: 'Aksi', sched: 'Jadwal' };
-const TITLES = { ringkasan: 'Ringkasan', laporan: 'Laporan', perangkat: 'Perangkat terdaftar', pengguna: 'Pengguna', telegram: 'Telegram', pengaturan: 'Pengaturan' };
+const TITLES = { ringkasan: 'Ringkasan', laporan: 'Laporan', perangkat: 'Perangkat terdaftar', pengguna: 'Pengguna', telegram: 'Telegram & notifikasi', pengaturan: 'Pengaturan', panduan: 'Panduan admin' };
 async function copy(text, label) { try { await navigator.clipboard.writeText(text); toast('ok', 'Disalin', label || ''); } catch (e) { toast('warn', 'Tidak bisa menyalin otomatis', 'Pilih teks lalu salin manual.'); } }
 const evItem = e => `<div class="ev ${e.lvl}"><i aria-hidden="true">${UI.ICON[e.lvl] || 'i'}</i><div><b>${esc(e.title)}</b>${e.body ? `<p>${esc(e.body)}</p>` : ''}${e.actor && e.actor !== 'sistem' ? `<span class="by">oleh ${esc(e.actor)}</span>` : ''}</div><small>${esc(e.name || (e.source === 'sim' ? 'Simulasi' : e.source))}<br>${dt(e.at)}</small></div>`;
 
@@ -83,7 +83,11 @@ async function secRingkasan(el) {
   setBadges(o);
   const days = o.weekDaily.reduce((m, d) => { m[d.day] = (m[d.day] || 0) + d.bg; return m; }, {});
   const dayKeys = Object.keys(days).sort();
-  el.innerHTML = `
+  const rd = o.ready ? o.ready.items : [];
+  const need = rd.filter(x => !x.ok && !x.optional).length;
+  const readyCard = rd.length ? `<div class="card ready ${need ? '' : 'done'}"><h3>${need ? `Siap dipakai? <small>${need} langkah lagi</small>` : 'Semua siap ✓ <small>website & bot siap dipakai</small>'}</h3>
+    <ul class="checklist">${rd.map(x => `<li class="${x.ok ? '' : x.optional ? 'opt' : 'no'}"><div><b>${esc(x.label)}</b>${x.ok ? '' : `<br><span class="muted small">${esc(x.hint)}</span>${x.link ? ` <a class="small" href="${esc(x.link)}">buka →</a>` : ''}`}</div></li>`).join('')}</ul></div>` : '';
+  el.innerHTML = readyCard + `
   <div class="tiles">
     <div class="tile green"><div class="k">Biogas 7 hari</div><div class="v">${nf(o.week.bg, 2)}<small>m³</small></div><div class="s">dipakai kompor ${nf(o.week.used, 2)} m³</div></div>
     <div class="tile"><div class="k">Hemat LPG 7 hari</div><div class="v">${rp(o.week.rupiah)}</div><div class="s">setara ${nf(o.week.lpg, 2)} kg LPG</div></div>
@@ -351,8 +355,9 @@ async function secPengguna(el) {
 /* =====================================================================
    TELEGRAM
    ===================================================================== */
+const tgl = (s, k, t, d) => `<div class="toggle-row"><div><b>${t}</b><span>${d}</span></div><button type="button" class="sw" role="switch" aria-checked="${!!s[k]}" data-k="${k}" aria-label="${esc(t)}"></button></div>`;
 async function secTelegram(el) {
-  const j = await api('api/admin/telegram'); const info = j.info, wh = j.webhook;
+  const j = await api('api/admin/telegram'); const info = j.info, wh = j.webhook, st = j.settings || {};
   const pend = j.chats.filter(c => !c.approved).length; $('#badgeTg').hidden = !pend; $('#badgeTg').textContent = pend;
   const whOk = wh && wh.url && !wh.last_error_message;
   el.innerHTML = `
@@ -364,7 +369,7 @@ async function secTelegram(el) {
     <div class="card"><h3>Webhook</h3>${info.enabled && info.mode === 'webhook' ? `
       ${whOk ? `<div class="okbox small">Terpasang ke <code>${esc(wh.url)}</code>${wh.pending_update_count ? ` · ${wh.pending_update_count} pesan antre` : ''}</div>` : `<div class="warnbox small">${wh && wh.url ? `Terpasang ke <code>${esc(wh.url)}</code> tetapi ada kesalahan: ${esc(wh.last_error_message || '')}` : '<b>Belum terpasang.</b> Bot tidak akan membalas sampai webhook dipasang.'}</div>`}
       <label class="fl" style="margin-top:10px">Alamat website (HTTPS)<input class="sel" id="whUrl" value="${esc(j.suggestedUrl)}"></label>
-      <div class="row"><button class="btn btn-gold sm" id="whSet">${wh && wh.url ? 'Pasang ulang webhook' : 'Pasang webhook'}</button>${wh && wh.url ? '<button class="btn btn-soft sm danger" id="whDel">Lepas webhook</button>' : ''}</div>
+      <div class="row"><button class="btn btn-gold sm" id="whAuto">Pasang otomatis</button><button class="btn btn-line sm" id="whSet">Pasang ke alamat di atas</button>${wh && wh.url ? '<button class="btn btn-soft sm danger" id="whDel">Lepas webhook</button>' : ''}</div>
       <p class="muted small">Pakai alamat produksi (mis. <code>https://nama-proyek.vercel.app</code>), bukan alamat preview.</p>` : info.enabled ? '<p class="muted small">Server lokal memakai long polling, jadi webhook tidak diperlukan. Webhook hanya untuk Vercel.</p>' : '<p class="muted small">Isi token bot dulu.</p>'}</div>
   </div>
   <div class="card"><h3>Chat yang memakai bot <small>${j.chats.length} chat</small></h3>
@@ -376,7 +381,67 @@ async function secTelegram(el) {
         <button class="btn btn-soft xs" data-a="sub" data-id="${esc(c.chat_id)}">${c.subscribed ? 'Matikan notifikasi' : 'Nyalakan notifikasi'}</button><button class="btn btn-soft xs" data-a="test" data-id="${esc(c.chat_id)}">Kirim uji</button><button class="btn btn-soft xs danger" data-a="del" data-id="${esc(c.chat_id)}">Hapus</button></div></td></tr>`).join('')
       : '<tr><td colspan="6" class="empty-s">Belum ada chat. Buka bot di Telegram, tekan Start, lalu muat ulang halaman ini.</td></tr>'}
     </tbody></table></div></div>
-  <div class="card"><h3>Pengumuman ke semua chat</h3><form id="fBc" class="stack"><textarea class="sel" name="text" rows="3" maxlength="3500" placeholder="mis. Besok pukul 09.00 pengurasan endapan dan ganti media scrubber." required></textarea><div><button class="btn btn-merah sm">Kirim ke chat yang disetujui</button></div></form></div>`;
+  <div class="grid2">
+    <div class="card"><h3>Notifikasi otomatis <small>dikirim bot tanpa perlu ditekan</small></h3><form id="fNotif" class="formgrid">
+      <div class="full">${tgl(st, 'notify_alerts', '🚨 Peringatan bahaya & waspada', 'Suhu, pH, tekanan, kebocoran gas, gas habis, dan saat kembali normal.')}${tgl(st, 'notify_actions', '⚙️ Aksi penting', 'Kompor, katup, buffer, pengurasan — baik oleh orang maupun kontrol otomatis.')}${tgl(st, 'notify_schedule', '🗓 Kegiatan terjadwal', 'Umpan harian, rekap smart bin sisa makan siang.')}${tgl(st, 'notify_sim', '🧪 Ikut kirim dari simulasi', 'Matikan bila sudah memakai alat asli supaya Telegram tidak ramai.')}</div>
+      <label>Peringatan yang sama diulang paling cepat tiap (menit)<input class="sel" type="number" name="alert_cooldown_min" value="${st.alert_cooldown_min}" min="0" max="1440"></label>
+      <label>Ringkasan status berkala tiap (jam, 0 = mati)<input class="sel" type="number" name="report_every_hours" value="${st.report_every_hours}" min="0" max="168"></label>
+      <div class="full"><button class="btn btn-gold sm">Simpan notifikasi</button></div></form>
+      <p class="muted small">Notifikasi berjalan dari jadwal otomatis (cron). Terakhir berjalan: <b>${j.lastCron ? ago(j.lastCron) : 'belum pernah'}</b>${!j.lastCron || Date.now() - j.lastCron > 20 * 60000 ? ' — <a href="#panduan">pasang cron</a> agar notifikasi tepat waktu.' : '.'}</p></div>
+    <div class="card"><h3>Kirim sekarang</h3>
+      <p class="muted small" style="margin-top:-4px">Dikirim ke semua chat yang disetujui dan notifikasinya aktif (${j.chats.filter(c => c.approved && c.subscribed).length} chat).</p>
+      <div class="row"><button class="btn btn-line sm" data-send="status">📊 Status reaktor</button><button class="btn btn-line sm" data-send="laporan">🗓 Laporan hari ini</button><button class="btn btn-line sm" data-send="perangkat">📟 Status perangkat</button></div>
+      <h3 style="margin-top:18px">Pengumuman</h3><form id="fBc" class="stack"><textarea class="sel" name="text" rows="3" maxlength="3500" placeholder="mis. Besok pukul 09.00 pengurasan endapan dan ganti media scrubber." required></textarea><div><button class="btn btn-merah sm">Kirim pengumuman</button></div></form></div>
+  </div>
+  <div class="card"><h3>Jadwal pesan otomatis <small>waktu ${esc(j.tz || 'WIB')}</small></h3>
+    <p class="muted small" style="margin-top:-4px">Contoh: laporan harian pukul 15.00, status pagi pukul 06.30, atau pengingat "kuras endapan" tiap Jumat. Pesan terkirim paling lambat beberapa menit setelah jam yang dipilih (sesuai jadwal cron).</p>
+    <div id="schList" class="sch-list"></div>
+    <div class="row"><button class="btn btn-line sm" id="schAdd">+ Tambah jadwal</button><button class="btn btn-gold sm" id="schSave">Simpan jadwal</button></div></div>`;
+  /* ----- jadwal ----- */
+  const DAYS = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+  let sch = (j.schedules || []).map(x => Object.assign({}, x));
+  const renderSch = () => {
+    const box = $('#schList');
+    box.innerHTML = sch.length ? sch.map((x, i) => `<div class="sch" data-i="${i}">
+      <label>Jenis<select class="sel" data-f="kind"><option value="laporan" ${x.kind === 'laporan' ? 'selected' : ''}>Laporan hari ini</option><option value="status" ${x.kind === 'status' ? 'selected' : ''}>Status reaktor</option><option value="teks" ${x.kind === 'teks' ? 'selected' : ''}>Pesan sendiri</option></select></label>
+      <label>Jam<input class="sel" type="time" data-f="time" value="${esc(x.time || '07:00')}"></label>
+      <div class="days" role="group" aria-label="Hari">${DAYS.map((d, k) => `<button type="button" class="${!x.days || !x.days.length || x.days.includes(k + 1) ? 'on' : ''}" data-d="${k + 1}">${d}</button>`).join('')}</div>
+      <label class="grow" ${x.kind === 'teks' ? '' : 'hidden'}>Isi pesan<input class="sel" data-f="text" maxlength="1500" value="${esc(x.text || '')}" placeholder="mis. Pengingat: kuras endapan 20 L hari ini"></label>
+      <label class="chk"><input type="checkbox" data-f="enabled" ${x.enabled !== false ? 'checked' : ''}> Aktif</label>
+      <button type="button" class="btn btn-soft xs danger" data-del>Hapus</button>
+      ${x.last ? `<span class="muted small full">Terakhir terkirim: ${esc(x.last)}</span>` : ''}</div>`).join('') : '<div class="empty-s">Belum ada jadwal. Klik “Tambah jadwal”.</div>';
+    box.querySelectorAll('.sch').forEach(row => {
+      const x = sch[+row.dataset.i];
+      row.querySelectorAll('[data-f]').forEach(inp => inp.addEventListener('change', () => {
+        const f = inp.dataset.f; x[f] = inp.type === 'checkbox' ? inp.checked : inp.value;
+        if (f === 'kind') renderSch();
+      }));
+      row.querySelectorAll('[data-d]').forEach(b => b.addEventListener('click', () => {
+        b.classList.toggle('on');
+        const on = [...row.querySelectorAll('[data-d].on')].map(e => +e.dataset.d);
+        x.days = on.length === 7 ? [] : on;
+      }));
+      row.querySelector('[data-del]').addEventListener('click', () => { sch.splice(+row.dataset.i, 1); renderSch(); });
+    });
+  };
+  renderSch();
+  $('#schAdd').addEventListener('click', () => { sch.push({ kind: 'laporan', time: '15:00', days: [1, 2, 3, 4, 5, 6], text: '', enabled: true }); renderSch(); });
+  $('#schSave').addEventListener('click', async () => {
+    if (sch.some(x => x.kind === 'teks' && !String(x.text || '').trim())) return toast('warn', 'Isi pesan kosong', 'Jadwal jenis “Pesan sendiri” perlu isi pesan.');
+    try { const r = await api('api/admin/telegram/schedules', { body: { schedules: sch } }); sch = r.schedules; renderSch(); toast('ok', 'Jadwal disimpan', `${sch.length} jadwal`); } catch (e) { toast('bad', 'Gagal', e.message); }
+  });
+  /* ----- notifikasi otomatis ----- */
+  el.querySelectorAll('#fNotif .sw').forEach(b => b.addEventListener('click', () => b.setAttribute('aria-checked', b.getAttribute('aria-checked') !== 'true')));
+  $('#fNotif').addEventListener('submit', async e => {
+    e.preventDefault(); const f = e.target; const body = { alert_cooldown_min: +f.alert_cooldown_min.value, report_every_hours: +f.report_every_hours.value };
+    f.querySelectorAll('.sw[data-k]').forEach(b => { body[b.dataset.k] = b.getAttribute('aria-checked') === 'true'; });
+    try { await api('api/admin/settings', { body }); toast('ok', 'Notifikasi disimpan', ''); } catch (err) { toast('bad', 'Gagal', err.message); }
+  });
+  el.querySelectorAll('[data-send]').forEach(b => b.addEventListener('click', async () => {
+    b.disabled = true;
+    try { const r = await api('api/admin/telegram/send', { body: { kind: b.dataset.send } }); toast('ok', 'Kirim sekarang', r.message); } catch (e) { toast('bad', 'Gagal', e.message); } finally { b.disabled = false; }
+  }));
+  const wa = $('#whAuto'); if (wa) wa.addEventListener('click', async () => { try { const r = await api('api/admin/telegram/webhook', { body: { action: 'auto' } }); toast('ok', 'Webhook', r.message); show('telegram', true); } catch (e) { toast('bad', 'Gagal memasang webhook', e.message); } });
   const s = $('#whSet'); if (s) s.addEventListener('click', async () => { try { const r = await api('api/admin/telegram/webhook', { body: { url: $('#whUrl').value.trim() } }); toast('ok', 'Webhook', r.message); show('telegram', true); } catch (e) { toast('bad', 'Gagal memasang webhook', e.message); } });
   const dl = $('#whDel'); if (dl) dl.addEventListener('click', async () => { if (await confirmBox('Lepas webhook?', 'Bot berhenti menerima pesan sampai webhook dipasang lagi.', 'Lepas', true)) { await api('api/admin/telegram/webhook', { body: { action: 'delete' } }); show('telegram', true); } });
   $('#fBc').addEventListener('submit', async e => { e.preventDefault(); try { const r = await api('api/admin/telegram/broadcast', { body: { text: e.target.text.value } }); toast('ok', 'Pengumuman', r.message); e.target.reset(); } catch (err) { toast('bad', 'Gagal', err.message); } });
@@ -405,9 +470,9 @@ async function secPengaturan(el) {
       <label class="full">Nama lokasi/SPPG<input class="sel" name="site_name" value="${esc(s.site_name)}" maxlength="60"></label>
       <label>Sumber utama dasbor & asisten<select class="sel" name="default_source">${j.sources.map(x => `<option value="${esc(x.id)}" ${x.id === s.default_source ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select></label>
       <label>Harga LPG 12 kg (Rp)<input class="sel" type="number" name="lpg_price" value="${s.lpg_price}" min="1000" step="1000"></label>
-      <label>Laporan status ke Telegram tiap (jam, 0 = mati)<input class="sel" type="number" name="report_every_hours" value="${s.report_every_hours}" min="0" max="168"></label>
       <label>Simpan riwayat selama (hari)<input class="sel" type="number" name="retention_days" value="${s.retention_days}" min="7" max="3650"></label>
-      <div class="full">${tg('allow_register', 'Pendaftaran terbuka', 'Orang bisa mendaftar sendiri; akun aktif setelah Anda setujui.')}${tg('public_dashboard', 'Dasbor bisa dilihat tamu', 'Tanpa masuk, tamu hanya melihat. Kendali & asisten tetap butuh akun.')}${tg('notify_sim', 'Notifikasi dari simulasi', 'Matikan bila sudah memakai alat asli supaya Telegram tidak ramai.')}</div>
+      <div class="full">${tg('allow_register', 'Pendaftaran terbuka', 'Orang bisa mendaftar sendiri; akun aktif setelah Anda setujui.')}${tg('public_dashboard', 'Dasbor bisa dilihat tamu', 'Tanpa masuk, tamu hanya melihat. Kendali & asisten tetap butuh akun.')}</div>
+      <p class="full muted small" style="margin:0">Pengaturan notifikasi Telegram ada di menu <a href="#telegram">Telegram & notifikasi</a>.</p>
       <div class="full"><button class="btn btn-gold">Simpan pengaturan</button></div></form></div>
     <div class="card"><h3>Keamanan akun</h3>
       <p class="small">Anda masuk sebagai <b>${esc(AUTH.user.name)}</b> (@${esc(AUTH.user.username)}).</p>
@@ -423,14 +488,14 @@ async function secPengaturan(el) {
       </ul></div>
   </div>
   <div class="card"><h3>Cron & alamat penting</h3>
-    <p class="small">Vercel Hobby (gratis) hanya menjalankan cron <b>sekali sehari</b>. Agar simulasi berjalan dan perangkat diam terdeteksi tiap beberapa menit, repositori sudah berisi <b>GitHub Actions</b> (<code>.github/workflows/cron.yml</code>) yang memanggil alamat di bawah tiap 5 menit. Isi secret <code>BIOLOOP_URL</code> di GitHub. Detail di panduan deploy.</p>
+    <p class="small">Vercel Hobby (gratis) hanya menjalankan cron <b>sekali sehari</b>. Agar simulasi berjalan dan perangkat diam terdeteksi tiap beberapa menit, repositori sudah berisi <b>GitHub Actions</b> (<code>.github/workflows/cron.yml</code>) yang memanggil alamat di bawah tiap 5 menit. Isi secret <code>BIOLOOP_URL</code> di GitHub, atau daftarkan alamat cron di <b>cron-job.org</b> (gratis). Detail di <a href="#panduan">Panduan</a>.</p>
     <div class="fl">Alamat cron<div class="copyline"><code id="cu">${esc(j.cronUrl)}</code><button class="btn btn-soft xs" data-copy="cu">Salin</button></div></div>
     <div class="fl" style="margin-top:10px">Alamat sensor ESP32<div class="copyline"><code id="su">${esc(j.sensorUrl)}</code><button class="btn btn-soft xs" data-copy="su">Salin</button></div></div>
     <div class="row"><button class="btn btn-line sm" id="runCron">Jalankan cron sekarang</button></div>
     ${j.stats ? `<p class="muted small">Isi database: ${nf(j.stats.readings)} pembacaan, ${nf(j.stats.events)} kejadian, ${nf(j.stats.conversations)} percakapan, ${nf(j.stats.bytes / 1048576, 1)} MB.</p>` : ''}</div>`;
   el.querySelectorAll('.sw').forEach(b => b.addEventListener('click', () => b.setAttribute('aria-checked', b.getAttribute('aria-checked') !== 'true')));
   $('#fSet').addEventListener('submit', async e => {
-    e.preventDefault(); const f = e.target; const body = { site_name: f.site_name.value, default_source: f.default_source.value, lpg_price: +f.lpg_price.value, report_every_hours: +f.report_every_hours.value, retention_days: +f.retention_days.value };
+    e.preventDefault(); const f = e.target; const body = { site_name: f.site_name.value, default_source: f.default_source.value, lpg_price: +f.lpg_price.value, retention_days: +f.retention_days.value };
     el.querySelectorAll('.sw[data-k]').forEach(b => { body[b.dataset.k] = b.getAttribute('aria-checked') === 'true'; });
     try { await api('api/admin/settings', { body }); toast('ok', 'Pengaturan disimpan', ''); $('#siteName').textContent = body.site_name; } catch (err) { toast('bad', 'Gagal', err.message); }
   });
@@ -440,9 +505,28 @@ async function secPengaturan(el) {
 }
 
 /* =====================================================================
+   PANDUAN (dokumen untuk admin)
+   ===================================================================== */
+const DOCS = [['PANDUAN_ADMIN.md', 'Panduan admin', 'Akun, persetujuan, laporan, perangkat, Telegram, notifikasi otomatis.'],
+  ['PANDUAN_SELESAIKAN.md', 'Menyelesaikan pemasangan', 'Langkah awam dari nol sampai website & bot siap.'],
+  ['PANDUAN_DEPLOY_VERCEL.md', 'Deploy GitHub + Supabase + Vercel', 'Memasang ulang atau memindah website.'],
+  ['PANDUAN_TERMINAL.md', 'Perintah terminal', 'npm run cek, npm run akun, npm run bot.'],
+  ['PANDUAN_PENGGUNA.md', 'Panduan pengguna umum', 'Bahan untuk dibagikan ke petugas dan warga.'],
+  ['ARSITEKTUR.md', 'Arsitektur teknis', 'API, database, keamanan (untuk teknisi).']];
+async function secPanduan(el) {
+  el.innerHTML = `<div class="docgrid">${DOCS.map(([f, t, d]) => `<button class="card doc" data-doc="${f}"><b>${t}</b><span class="muted small">${d}</span></button>`).join('')}</div><div class="card md" id="docView" hidden></div>`;
+  el.querySelectorAll('[data-doc]').forEach(b => b.addEventListener('click', async () => {
+    const v = $('#docView'); v.hidden = false; v.innerHTML = '<p class="muted">Memuat…</p>';
+    el.querySelectorAll('[data-doc]').forEach(x => x.classList.toggle('on', x === b));
+    try { const r = await fetch('docs/' + b.dataset.doc, { cache: 'no-cache' }); if (!r.ok) throw new Error('HTTP ' + r.status); v.innerHTML = MD.render(await r.text()); v.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    catch (e) { v.innerHTML = `<div class="warnbox">Dokumen tidak bisa dimuat (${esc(e.message)}).</div>`; }
+  }));
+}
+
+/* =====================================================================
    NAVIGASI & AKSES
    ===================================================================== */
-const SECS = { ringkasan: secRingkasan, laporan: secLaporan, perangkat: secPerangkat, pengguna: secPengguna, telegram: secTelegram, pengaturan: secPengaturan };
+const SECS = { ringkasan: secRingkasan, laporan: secLaporan, perangkat: secPerangkat, pengguna: secPengguna, telegram: secTelegram, pengaturan: secPengaturan, panduan: secPanduan };
 let current = null;
 async function show(name, force) {
   if (!SECS[name]) name = 'ringkasan';

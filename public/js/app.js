@@ -119,7 +119,7 @@ const modalTitle = $('#modalTitle'), modalBody = $('#modalBody');
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#modal').hidden && !infoEl.hidden) APP.hideInfo(); });
 
 /* ---------- dokumen ---------- */
-const DOC_TITLES = { 'PANDUAN_TERMINAL.md': 'Perintah terminal', 'PANDUAN_DEPLOY_VERCEL.md': 'Panduan deploy', 'PANDUAN_SETUP.md': 'Panduan setup', 'PANDUAN_PENGGUNAAN.md': 'Panduan penggunaan', 'ARSITEKTUR.md': 'Arsitektur sistem' };
+const DOC_TITLES = { 'PANDUAN_PENGGUNA.md': 'Panduan pengguna', 'PANDUAN_ADMIN.md': 'Panduan admin', 'PANDUAN_TERMINAL.md': 'Perintah terminal', 'PANDUAN_DEPLOY_VERCEL.md': 'Panduan deploy', 'PANDUAN_SETUP.md': 'Panduan setup', 'ARSITEKTUR.md': 'Arsitektur sistem' };
 async function openDoc(name) {
   openModal(DOC_TITLES[name] || name, '<p class="muted">Memuat dokumen…</p>');
   try {
@@ -139,15 +139,30 @@ $$('[data-doc]').forEach(b => b.addEventListener('click', () => openDoc(b.datase
 const connEl = $('#conn');
 function setConn(cls, text) { connEl.className = 'conn ' + cls; connEl.querySelector('span').textContent = text; }
 
-async function detect() {
-  if (location.protocol === 'file:') return startDemo('file');
+/* Server di Vercel bisa lambat saat "bangun" (cold start) dan database perlu waktu tersambung.
+   Karena itu: tunggu sampai 25 detik, coba 2 kali, dan bila tetap gagal tampilkan mode demo
+   sambil terus mencoba tiap 20 detik; begitu server menjawab, halaman beralih ke data server. */
+async function fetchHealth(ms) {
+  const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), ms);
   try {
-    const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 8000);
-    const r = await fetch('api/health', { signal: ctl.signal, cache: 'no-store' }); clearTimeout(tm);
+    const r = await fetch('api/health', { signal: ctl.signal, cache: 'no-store' });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const h = await r.json(); if (!h || !h.ok) throw new Error('bukan server BIOLOOP');
-    startServer(h);
-  } catch (e) { startDemo('noserver'); }
+    return h;
+  } finally { clearTimeout(tm); }
+}
+async function detect() {
+  if (location.protocol === 'file:') return startDemo('file');
+  setConn('', 'Menghubungkan…');
+  for (let i = 0; i < 2; i++) {
+    try { return startServer(await fetchHealth(25000)); }
+    catch (e) { if (i === 0) setConn('', 'Server sedang bangun, tunggu sebentar…'); }
+  }
+  startDemo('noserver');
+  const retry = setInterval(async () => {
+    try { const h = await fetchHealth(25000); clearInterval(retry); toast('ok', 'Tersambung ke server', 'Data sekarang diambil dari server.'); setTimeout(() => location.reload(), 1200); void h; }
+    catch (e) { /* coba lagi nanti */ }
+  }, 20000);
 }
 
 /* Mode server: data diambil berkala (cocok untuk Vercel yang tidak mendukung koneksi terbuka lama). */
@@ -415,12 +430,13 @@ chartSel.addEventListener('change', drawChart);
 /* =====================================================================
    PANEL: kendali, grafik, sisa pangan, kalkulator, telegram
    ===================================================================== */
+function selectTab(name) { const b = $(`.tabs button[data-tab="${name}"]`); if (b && !b.hidden) b.click(); }
 $$('.tabs button').forEach(b => b.addEventListener('click', () => {
   $$('.tabs button').forEach(x => x.setAttribute('aria-selected', x === b));
   $$('.tab').forEach(t => t.classList.toggle('on', t.id === 'tab-' + b.dataset.tab));
   updateUI(true);
 }));
-const activeTab = () => { const b = $('.tabs button[aria-selected="true"]'); return b ? b.dataset.tab : 'kendali'; };
+const activeTab = () => { const b = $('.tabs button[aria-selected="true"]'); return b ? b.dataset.tab : 'grafik'; };
 
 const feedType = $('#feedType');
 feedType.innerHTML = Object.entries(SIM.FOOD).map(([k, f]) => `<option value="${k}">${esc(f.n)}</option>`).join('');
@@ -458,11 +474,25 @@ function syncMode() {
   const sensor = APPSTATE.srvMode === 'sensor';
   $$('.scen button, #btnFeed').forEach(b => { b.disabled = sensor; });
   $('#speed').disabled = sensor; $('#pause').disabled = sensor;
-  $('#btnReset').hidden = APPSTATE.mode === 'server' && !(u && u.role === 'admin');
-  $('#guestNote').hidden = APPSTATE.mode !== 'server' || !!u;
+  /* Pembagian tampilan:
+     - tamu (siapa pun): memantau grafik, sisa pangan, catatan, notifikasi, kalkulator;
+     - pengguna terdaftar: + tab Kendali dan asisten AI;
+     - admin: + kecepatan simulasi, jeda, uji gangguan, mulai ulang.
+     Di mode demo (tanpa server) semuanya tampil karena simulasi hanya ada di browser ini. */
+  const demo = APPSTATE.mode !== 'server', admin = !!(u && u.role === 'admin');
+  $$('.only-admin').forEach(el => { el.hidden = !(demo || admin); });
+  $('#btnReset').hidden = !(demo || admin);
+  const canControl = demo || !!u, kb = $('#tabBtnKendali');
+  kb.hidden = !canControl;
+  if (!canControl && activeTab() === 'kendali') selectTab('grafik');
+  if (canControl && !syncMode.shownCtl && u) { syncMode.shownCtl = true; selectTab('kendali'); }
+  if (!u) syncMode.shownCtl = false;
+  $('#guestNote').hidden = demo || !!u;
+  $('#helpLogin').textContent = u ? `Akun: ${u.name}` : 'Masuk / daftar akun';
 }
 document.addEventListener('bioloop:auth', () => { syncMode(); renderTele(); });
 $('#guestLogin').addEventListener('click', () => AUTH.openLogin());
+$('#helpLogin').addEventListener('click', () => { if (window.AUTH && AUTH.user) { AUTH.openAccount ? AUTH.openAccount() : toast('info', 'Sudah masuk', `Anda masuk sebagai ${AUTH.user.name}.`); } else AUTH.openLogin(); });
 
 /* ---------- rendering per tab ---------- */
 function renderKendali() {
@@ -526,6 +556,8 @@ function renderTele() {
   const el = $('#teleStatus'); const h = APPSTATE.health; const t = h && h.telegram;
   const admin = window.AUTH && AUTH.user && AUTH.user.role === 'admin';
   $('#teleAdmin').hidden = !admin;
+  const bl = $('#botLink'), un = APPSTATE.mode === 'server' && t && t.username;
+  bl.hidden = !un; if (un) { bl.href = 'https://t.me/' + encodeURIComponent(t.username); bl.textContent = `Buka bot @${t.username}`; }
   if (APPSTATE.mode !== 'server') { el.className = 'tele-card off'; el.innerHTML = '<b>Telegram belum aktif</b><p>Website sedang di mode demo. Buka lewat alamat server agar bot bisa mengirim notifikasi.</p>'; return; }
   if (!t || !t.enabled) { el.className = 'tele-card off'; el.innerHTML = '<b>Bot Telegram belum dipasang</b><p>Admin perlu mengisi <code>TELEGRAM_BOT_TOKEN</code> di pengaturan server (Vercel → Environment Variables).</p>'; return; }
   if (!t.username) { el.className = 'tele-card off'; el.innerHTML = `<b>Bot belum tersambung</b><p>${esc(t.error || 'Sedang menghubungkan ke Telegram…')}</p>`; return; }

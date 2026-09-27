@@ -218,18 +218,33 @@ git commit -m "<tulis apa yang diubah>"
 git push
 ```
 
-### 2.3 Memeriksa bot Telegram secara manual
+### 2.3 Bot Telegram dari terminal (`npm run bot`)
 
-Info bot dan webhook (ganti `<TOKEN>` dengan token bot):
+Memakai `TELEGRAM_BOT_TOKEN` dan `DATABASE_URL` di file `.env` (harus sama dengan di Vercel).
 
 ```
-Invoke-RestMethod "https://api.telegram.org/bot<TOKEN>/getMe"
-Invoke-RestMethod "https://api.telegram.org/bot<TOKEN>/getWebhookInfo"
+npm run bot -- info
+npm run bot -- pasang https://bioreaktorloop.vercel.app
+npm run bot -- chat
+npm run bot -- setujui 123456789
+npm run bot -- cabut 123456789
+npm run bot -- kirim "Besok pukul 09.00 pengurasan endapan"
+npm run bot -- status
+npm run bot -- laporan
+npm run bot -- lepas
 ```
 
-**Memasang** webhook tetap lewat panel admin online (menu Telegram → Pasang webhook), karena panel otomatis menyertakan kode rahasia webhook. Jangan memasang webhook dengan perintah manual.
+| Perintah | Fungsi |
+|---|---|
+| `info` | Nama bot, alamat webhook, error terakhir, jumlah chat |
+| `pasang <alamat>` | Pasang webhook ke website online (lengkap dengan kode rahasia) |
+| `chat` | Daftar chat yang pernah menekan Start, beserta chat id |
+| `setujui` / `cabut <chat id>` | Beri/cabut akses chat |
+| `kirim "teks"` | Pengumuman ke semua chat yang disetujui |
+| `status` / `laporan` | Kirim status reaktor / laporan hari ini sekarang |
+| `lepas` | Lepas webhook (misalnya untuk mencoba bot di komputer sendiri) |
 
-Jangan menempel token ke chat, grup, atau tangkapan layar. Bila terlanjur, buka @BotFather → `/revoke`.
+Biasanya Anda tidak perlu `pasang`: website memasang webhook otomatis. Jangan menempel token ke chat, grup, atau tangkapan layar. Bila terlanjur, buka @BotFather → `/revoke`.
 
 ### 2.4 Menghapus data lokal (mulai dari awal)
 
@@ -242,21 +257,33 @@ npm start
 
 Akun admin `Handoyo` / `12345` dibuat lagi otomatis. (Data di Supabase **tidak** terhapus oleh perintah ini.)
 
-### 2.5 Lupa kata sandi admin (komputer sendiri)
+### 2.5 Akun dan lupa kata sandi (`npm run akun`)
+
+Bekerja pada database di `DATABASE_URL` file `.env`. Bila sama dengan di Vercel, perubahan langsung berlaku di website online. Baris pertama hasil perintah selalu menulis database yang dipakai; periksa dulu.
 
 ```
-$env:ADMIN_RESET_PASSWORD="<kata sandi sementara minimal 8 karakter>"
-npm start
+npm run akun -- daftar
+npm run akun -- awal
+npm run akun -- sandi Handoyo 12345
+npm run akun -- buat rina rina2045 user "Rina Ahli Gizi"
+npm run akun -- admin rina
+npm run akun -- user rina
+npm run akun -- aktifkan rina
+npm run akun -- nonaktifkan rina
+npm run akun -- hapus rina
 ```
 
-Masuk dengan `Handoyo` dan kata sandi sementara itu, ganti kata sandi, lalu hentikan server (Ctrl + C) dan jalankan:
+| Perintah | Fungsi |
+|---|---|
+| `daftar` | Lihat semua akun (kata sandi tidak bisa ditampilkan) |
+| `awal` | Buat/pulihkan akun mudah: `Handoyo/12345`, `admin/admin123` (admin), `petugas/petugas123`, `gizi/gizi123`, `guru/guru123` (pengguna) |
+| `sandi <nama> <sandi>` | Ganti kata sandi dan buka kunci akun |
+| `buat <nama> <sandi> [admin\|user] "Nama"` | Tambah akun |
+| `admin` / `user <nama>` | Ubah peran |
+| `aktifkan` / `nonaktifkan <nama>` | Setujui atau matikan akun |
+| `hapus <nama>` | Hapus akun |
 
-```
-Remove-Item Env:ADMIN_RESET_PASSWORD
-npm start
-```
-
-Bila memakai `DATABASE_URL` Supabase yang sama dengan Vercel, reset ini juga berlaku untuk website online.
+Daftar akun mudah bisa diubah di bagian `AKUN_AWAL` file `server/akun.js`.
 
 ### 2.6 Port 3000 sudah dipakai
 
@@ -290,6 +317,8 @@ Atau pakai port lain: tambahkan `PORT=3001` di `.env`, lalu buka `http://localho
 | Panggil cron Vercel | `curl https://<alamat-anda>.vercel.app/api/cron` |
 | Hapus data lokal | `rm data/*.json` |
 | Reset admin | `ADMIN_RESET_PASSWORD='<sandi sementara>' npm start` |
+| Akun mudah / lupa sandi | `npm run akun -- awal` · `npm run akun -- sandi Handoyo 12345` |
+| Bot Telegram | `npm run bot -- info` · `npm run bot -- chat` · `npm run bot -- setujui <chat id>` |
 | Cari proses di port 3000 | `lsof -i :3000` lalu `kill <PID>` |
 
 ---

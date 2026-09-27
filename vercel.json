@@ -1,21 +1,52 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "outputDirectory": "public",
+  "regions": [
+    "syd1"
+  ],
   "rewrites": [
-    { "source": "/api/:path*", "destination": "/api/index?__path=:path*" }
+    {
+      "source": "/api/:path*",
+      "destination": "/api/index?__path=:path*"
+    }
   ],
   "functions": {
-    "api/index.js": { "maxDuration": 60 }
+    "api/index.js": {
+      "maxDuration": 60
+    }
   },
   "crons": [
-    { "path": "/api/cron", "schedule": "0 21 * * *" }
+    {
+      "path": "/api/cron",
+      "schedule": "0 21 * * *"
+    }
   ],
   "headers": [
-    { "source": "/(.*)", "headers": [
-      { "key": "X-Content-Type-Options", "value": "nosniff" },
-      { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-      { "key": "X-Frame-Options", "value": "SAMEORIGIN" }
-    ] },
-    { "source": "/admin.html", "headers": [ { "key": "X-Robots-Tag", "value": "noindex" } ] }
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        }
+      ]
+    },
+    {
+      "source": "/admin.html",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
+    }
   ]
 }

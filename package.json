@@ -1,13 +1,15 @@
 {
   "name": "mbg-bioloop-ai",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "private": true,
   "description": "Bioreaktor sisa pangan MBG untuk biogas dapur SPPG: website 3D, akun pengguna & admin, laporan, bot Telegram, asisten Gemini dengan memori. Siap Vercel + Supabase.",
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
     "dev": "node --watch server/index.js",
-    "cek": "node server/cek.js"
+    "cek": "node server/cek.js",
+    "akun": "node server/akun.js",
+    "bot": "node server/bot.js"
   },
   "engines": {
     "node": ">=20"
