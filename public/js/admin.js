@@ -356,6 +356,17 @@ async function secPengguna(el) {
    TELEGRAM
    ===================================================================== */
 const tgl = (s, k, t, d) => `<div class="toggle-row"><div><b>${t}</b><span>${d}</span></div><button type="button" class="sw" role="switch" aria-checked="${!!s[k]}" data-k="${k}" aria-label="${esc(t)}"></button></div>`;
+/* Cek koneksi: database, Telegram, webhook, Gemini, cron */
+async function runDiag(box, btn) {
+  if (btn) btn.disabled = true; box.innerHTML = '<p class="muted small">Memeriksa koneksi… (bisa sampai 30 detik)</p>';
+  try {
+    const d = await api('api/admin/diag');
+    const row = (label, x) => x ? `<li class="${x.ok ? '' : 'no'}"><div><b>${label}</b> <span class="muted small">${x.ms != null ? x.ms + ' ms' : ''}</span><br><span class="small">${esc(x.ok ? (x.info || 'baik') : (x.error || 'gagal'))}</span></div></li>` : '';
+    box.innerHTML = `<ul class="checklist" style="margin-top:12px">${row('Database', d.database)}${row('Bot Telegram', d.telegram)}${row('Webhook', d.webhook)}${row('Asisten Gemini', d.gemini)}${row('Cron', { ok: d.cron.ok, info: d.cron.info ? 'terakhir ' + ago(d.cron.info) : '', error: d.cron.info ? 'terakhir ' + ago(d.cron.info) + ' (lebih dari 20 menit)' : 'belum pernah berjalan' })}</ul>
+      <p class="muted small">Server Vercel: ${esc(d.region || 'lokal')} · versi ${esc(d.version)}</p>`;
+  } catch (e) { box.innerHTML = `<div class="warnbox small">${esc(e.message)}</div>`; }
+  if (btn) btn.disabled = false;
+}
 async function secTelegram(el) {
   const j = await api('api/admin/telegram'); const info = j.info, wh = j.webhook, st = j.settings || {};
   const pend = j.chats.filter(c => !c.approved).length; $('#badgeTg').hidden = !pend; $('#badgeTg').textContent = pend;
@@ -365,7 +376,9 @@ async function secTelegram(el) {
     <div class="card"><h3>Bot</h3>${!info.enabled ? `<div class="warnbox"><b>Token bot belum diisi.</b><br>Buat bot di <b>@BotFather</b> (ketik <code>/newbot</code>), lalu isi <code>TELEGRAM_BOT_TOKEN</code> di Vercel → Settings → Environment Variables, lalu Redeploy.</div>` : `
       <p style="margin:0 0 8px"><b>@${esc(info.username || '?')}</b> ${info.username ? `<a class="small" href="https://t.me/${encodeURIComponent(info.username)}" target="_blank" rel="noopener">buka di Telegram →</a>` : ''}</p>
       <p class="small muted">Mode <b>${info.mode === 'webhook' ? 'webhook' : 'long polling'}</b>. ${info.mode === 'webhook' ? 'Telegram mengirim pesan ke website ini.' : 'Server lokal menjemput pesan terus-menerus.'} ${info.requireApproval ? 'Chat baru harus disetujui admin.' : 'Semua chat langsung diterima.'}</p>
-      ${info.error ? `<div class="warnbox small">Kesalahan terakhir: ${esc(info.error)}</div>` : ''}`}</div>
+      ${info.error ? `<div class="warnbox small">Kesalahan terakhir: ${esc(info.error)}</div>` : ''}
+      <div class="row"><button class="btn btn-line sm" id="tgProfile">Atur profil & menu bot</button><button class="btn btn-soft sm" id="tgDiag">Cek koneksi</button></div>
+      <div id="diagOut"></div>`}</div>
     <div class="card"><h3>Webhook</h3>${info.enabled && info.mode === 'webhook' ? `
       ${whOk ? `<div class="okbox small">Terpasang ke <code>${esc(wh.url)}</code>${wh.pending_update_count ? ` · ${wh.pending_update_count} pesan antre` : ''}</div>` : `<div class="warnbox small">${wh && wh.url ? `Terpasang ke <code>${esc(wh.url)}</code> tetapi ada kesalahan: ${esc(wh.last_error_message || '')}` : '<b>Belum terpasang.</b> Bot tidak akan membalas sampai webhook dipasang.'}</div>`}
       <label class="fl" style="margin-top:10px">Alamat website (HTTPS)<input class="sel" id="whUrl" value="${esc(j.suggestedUrl)}"></label>
@@ -378,7 +391,7 @@ async function secTelegram(el) {
     ${j.chats.length ? j.chats.map(c => `<tr class="${c.approved ? '' : 'pending'}"><td><b>${esc(c.title || '(tanpa nama)')}</b>${c.username ? `<br><span class="muted small">@${esc(c.username)}</span>` : ''}</td><td class="mono small">${esc(c.chat_id)}</td>
       <td>${c.approved ? '<span class="badge ok"><i></i>Disetujui</span>' : '<span class="badge warn"><i></i>Menunggu</span>'}</td><td>${c.subscribed ? 'Aktif' : '<span class="muted">Mati</span>'}</td><td class="small">${ago(c.last_seen)}</td>
       <td><div class="actions">${c.approved ? `<button class="btn btn-soft xs" data-a="revoke" data-id="${esc(c.chat_id)}">Cabut</button>` : `<button class="btn btn-gold xs" data-a="approve" data-id="${esc(c.chat_id)}">Setujui</button>`}
-        <button class="btn btn-soft xs" data-a="sub" data-id="${esc(c.chat_id)}">${c.subscribed ? 'Matikan notifikasi' : 'Nyalakan notifikasi'}</button><button class="btn btn-soft xs" data-a="test" data-id="${esc(c.chat_id)}">Kirim uji</button><button class="btn btn-soft xs danger" data-a="del" data-id="${esc(c.chat_id)}">Hapus</button></div></td></tr>`).join('')
+        <button class="btn btn-soft xs" data-a="sub" data-id="${esc(c.chat_id)}">${c.subscribed ? 'Matikan notifikasi' : 'Nyalakan notifikasi'}</button><button class="btn btn-soft xs" data-a="test" data-id="${esc(c.chat_id)}">Kirim pesan tes</button><button class="btn btn-soft xs danger" data-a="del" data-id="${esc(c.chat_id)}">Hapus</button></div></td></tr>`).join('')
       : '<tr><td colspan="6" class="empty-s">Belum ada chat. Buka bot di Telegram, tekan Start, lalu muat ulang halaman ini.</td></tr>'}
     </tbody></table></div></div>
   <div class="grid2">
@@ -441,6 +454,8 @@ async function secTelegram(el) {
     b.disabled = true;
     try { const r = await api('api/admin/telegram/send', { body: { kind: b.dataset.send } }); toast('ok', 'Kirim sekarang', r.message); } catch (e) { toast('bad', 'Gagal', e.message); } finally { b.disabled = false; }
   }));
+  const pf = $('#tgProfile'); if (pf) pf.addEventListener('click', async () => { pf.disabled = true; try { const r = await api('api/admin/telegram/profile', { body: {} }); toast('ok', 'Profil bot', r.message); } catch (e) { toast('bad', 'Gagal', e.message); } finally { pf.disabled = false; } });
+  const dg = $('#tgDiag'); if (dg) dg.addEventListener('click', () => runDiag($('#diagOut'), dg));
   const wa = $('#whAuto'); if (wa) wa.addEventListener('click', async () => { try { const r = await api('api/admin/telegram/webhook', { body: { action: 'auto' } }); toast('ok', 'Webhook', r.message); show('telegram', true); } catch (e) { toast('bad', 'Gagal memasang webhook', e.message); } });
   const s = $('#whSet'); if (s) s.addEventListener('click', async () => { try { const r = await api('api/admin/telegram/webhook', { body: { url: $('#whUrl').value.trim() } }); toast('ok', 'Webhook', r.message); show('telegram', true); } catch (e) { toast('bad', 'Gagal memasang webhook', e.message); } });
   const dl = $('#whDel'); if (dl) dl.addEventListener('click', async () => { if (await confirmBox('Lepas webhook?', 'Bot berhenti menerima pesan sampai webhook dipasang lagi.', 'Lepas', true)) { await api('api/admin/telegram/webhook', { body: { action: 'delete' } }); show('telegram', true); } });
@@ -471,7 +486,7 @@ async function secPengaturan(el) {
       <label>Sumber utama dasbor & asisten<select class="sel" name="default_source">${j.sources.map(x => `<option value="${esc(x.id)}" ${x.id === s.default_source ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select></label>
       <label>Harga LPG 12 kg (Rp)<input class="sel" type="number" name="lpg_price" value="${s.lpg_price}" min="1000" step="1000"></label>
       <label>Simpan riwayat selama (hari)<input class="sel" type="number" name="retention_days" value="${s.retention_days}" min="7" max="3650"></label>
-      <div class="full">${tg('allow_register', 'Pendaftaran terbuka', 'Orang bisa mendaftar sendiri; akun aktif setelah Anda setujui.')}${tg('public_dashboard', 'Dasbor bisa dilihat tamu', 'Tanpa masuk, tamu hanya melihat. Kendali & asisten tetap butuh akun.')}</div>
+      <div class="full">${tg('allow_register', 'Pendaftaran terbuka', 'Orang bisa mendaftar sendiri; akun aktif setelah Anda setujui.')}${tg('public_dashboard', 'Dasbor bisa dilihat tamu', 'Tanpa masuk, pengunjung bisa memantau dan bertanya ke asisten. Kendali tetap butuh akun.')}</div>
       <p class="full muted small" style="margin:0">Pengaturan notifikasi Telegram ada di menu <a href="#telegram">Telegram & notifikasi</a>.</p>
       <div class="full"><button class="btn btn-gold">Simpan pengaturan</button></div></form></div>
     <div class="card"><h3>Keamanan akun</h3>
@@ -487,6 +502,10 @@ async function secPengaturan(el) {
         <li class="${env.cronSecret ? '' : 'no'}">CRON_SECRET ${env.cronSecret ? 'diisi' : 'tidak diisi (endpoint cron terbuka, tidak berbahaya)'}</li>
       </ul></div>
   </div>
+  <div class="card"><h3>Data riwayat <small>mengisi ringkasan, grafik, laporan & aktivitas</small></h3>
+    <p class="small">Mengisi riwayat 30 hari dari <b>model bioreaktor</b> (sumber "Simulasi"), lengkap dengan jadwal umpan, kompor, beberapa peringatan, dan aktivitas petugas. Riwayat simulasi lama diganti, dan simulasi di dasbor dilanjutkan dengan jam nyata. Data alat ESP32 asli tidak disentuh.</p>
+    <p class="small muted" id="seedInfo">Memeriksa…</p>
+    <div class="row"><button class="btn btn-gold sm" id="seedIsi">Isi riwayat 30 hari</button><button class="btn btn-soft sm danger" id="seedHapus">Hapus riwayat</button></div></div>
   <div class="card"><h3>Cron & alamat penting</h3>
     <p class="small">Vercel Hobby (gratis) hanya menjalankan cron <b>sekali sehari</b>. Agar simulasi berjalan dan perangkat diam terdeteksi tiap beberapa menit, repositori sudah berisi <b>GitHub Actions</b> (<code>.github/workflows/cron.yml</code>) yang memanggil alamat di bawah tiap 5 menit. Isi secret <code>BIOLOOP_URL</code> di GitHub, atau daftarkan alamat cron di <b>cron-job.org</b> (gratis). Detail di <a href="#panduan">Panduan</a>.</p>
     <div class="fl">Alamat cron<div class="copyline"><code id="cu">${esc(j.cronUrl)}</code><button class="btn btn-soft xs" data-copy="cu">Salin</button></div></div>
@@ -501,6 +520,19 @@ async function secPengaturan(el) {
   });
   $('#chPw').addEventListener('click', () => AUTH.openPassword());
   el.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', () => copy($('#' + b.dataset.copy).textContent)));
+  const seedInfo = async () => { try { const s = (await api('api/admin/seed')).seed; $('#seedInfo').textContent = s ? `Sudah diisi ${dt(s.at)}: ${nf(s.readings)} pembacaan, ${nf(s.events)} kejadian (${s.days} hari).` : 'Belum diisi.'; } catch (e) { $('#seedInfo').textContent = ''; } };
+  seedInfo();
+  $('#seedIsi').addEventListener('click', async e => {
+    if (!(await confirmBox('Isi riwayat 30 hari?', 'Riwayat simulasi lama diganti dengan riwayat 30 hari dari model. Data alat asli, akun, dan chat Telegram tidak dihapus.', 'Isi sekarang'))) return;
+    e.target.disabled = true; e.target.textContent = 'Menyiapkan…';
+    try { const r = await api('api/admin/seed', { body: { action: 'isi', days: 30 } }); toast('ok', 'Riwayat siap', r.message); seedInfo(); }
+    catch (err) { toast('bad', 'Gagal', err.message); }
+    e.target.disabled = false; e.target.textContent = 'Isi riwayat 30 hari';
+  });
+  $('#seedHapus').addEventListener('click', async () => {
+    if (!(await confirmBox('Hapus riwayat?', 'Pembacaan dan kejadian simulasi dalam periode riwayat, serta pengguna tambahan (siti, rahmat, dewi), akan dihapus.', 'Hapus', true))) return;
+    try { const r = await api('api/admin/seed', { body: { action: 'hapus' } }); toast('ok', 'Riwayat', r.message); seedInfo(); } catch (err) { toast('bad', 'Gagal', err.message); }
+  });
   $('#runCron').addEventListener('click', async () => { try { const r = await api('api/admin/cron', { body: {} }); toast('ok', 'Cron dijalankan', `${r.ticked.length} sumber diperbarui`); } catch (e) { toast('bad', 'Gagal', e.message); } });
 }
 
@@ -509,6 +541,7 @@ async function secPengaturan(el) {
    ===================================================================== */
 const DOCS = [['PANDUAN_ADMIN.md', 'Panduan admin', 'Akun, persetujuan, laporan, perangkat, Telegram, notifikasi otomatis.'],
   ['PANDUAN_SELESAIKAN.md', 'Menyelesaikan pemasangan', 'Langkah awam dari nol sampai website & bot siap.'],
+  ['PANDUAN_BOTFATHER.md', 'Template bot Telegram', 'Teks siap salin untuk @BotFather dan langkah agar peringatan terkirim.'],
   ['PANDUAN_DEPLOY_VERCEL.md', 'Deploy GitHub + Supabase + Vercel', 'Memasang ulang atau memindah website.'],
   ['PANDUAN_TERMINAL.md', 'Perintah terminal', 'npm run cek, npm run akun, npm run bot.'],
   ['PANDUAN_PENGGUNA.md', 'Panduan pengguna umum', 'Bahan untuk dibagikan ke petugas dan warga.'],
@@ -536,7 +569,12 @@ async function show(name, force) {
   $('#pageTitle').textContent = TITLES[name]; document.title = `${TITLES[name]} | Panel Admin MBG-BIOLOOP`;
   if (current === name && !force) return; current = name;
   const el = $('#sec-' + name);
-  try { await SECS[name](el); } catch (e) { el.innerHTML = `<div class="warnbox">${esc(e.message)}${e.status === 401 ? ' <a href="#" id="relog">Masuk lagi</a>' : ''}</div>`; if (e.status === 401) AUTH.refresh(); }
+  try { await SECS[name](el); } catch (e) {
+    el.innerHTML = `<div class="warnbox">${esc(e.message)}${e.status === 401 ? ' <a href="#" id="relog">Masuk lagi</a>' : ''}<div class="row"><button class="btn btn-gold sm" id="secRetry">Coba lagi</button><button class="btn btn-line sm" id="secDiag">Cek koneksi</button></div><div id="secDiagOut"></div></div>`;
+    if (e.status === 401) AUTH.refresh();
+    $('#secRetry').addEventListener('click', () => show(name, true));
+    $('#secDiag').addEventListener('click', e2 => runDiag($('#secDiagOut'), e2.target));
+  }
 }
 window.addEventListener('hashchange', () => show(location.hash.slice(1)));
 let gatedFor = null;

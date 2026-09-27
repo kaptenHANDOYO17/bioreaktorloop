@@ -6,15 +6,15 @@ Panduan ini untuk **siapa saja**: petugas dapur SPPG, ahli gizi, guru, orang tua
 
 | Siapa | Bisa apa | Perlu apa |
 |---|---|---|
-| **Pengunjung umum** | Melihat dasbor 3D, angka sensor, grafik, sisa pangan, catatan kejadian, kalkulator, data penelitian | Buka alamat website saja, tanpa akun |
-| **Pengguna terdaftar** (petugas, ahli gizi) | Semua di atas + tab **Kendali** (kompor, buffer, umpan, kuras) + **Asisten AI** yang mengingat obrolan | Akun dari admin, atau daftar lalu disetujui admin |
+| **Pengunjung umum** | Melihat dasbor 3D, angka sensor, grafik, sisa pangan, catatan kejadian, kalkulator, data penelitian, dan **bertanya ke Asisten AI** | Buka alamat website saja, tanpa akun |
+| **Pengguna terdaftar** (petugas, ahli gizi) | Semua di atas + tab **Kendali** (kompor, buffer, umpan, kuras) + asisten yang bisa **menjalankan perintah** dan mengingat obrolan per akun | Akun dari admin, atau daftar lalu disetujui admin |
 | **Admin** | Semua di atas + **panel admin** (laporan, perangkat, pengguna, Telegram, pengaturan) | Akun admin |
 
 ## 1. Memantau tanpa akun
 
 1. Buka alamat website, misalnya `https://bioreaktorloop.vercel.app`.
 2. Klik **Pantau reaktor sekarang** atau menu **Pantau**.
-3. Tunggu titik di pojok kanan atas berubah **hijau "Terhubung"**. Saat website baru "bangun", ini bisa memakan waktu 5–20 detik; tulisannya "Menghubungkan…" atau "Server sedang bangun". Bila sempat muncul **Mode demo**, biarkan halaman terbuka: website terus mencoba dan otomatis beralih ke data server begitu tersambung.
+3. Tunggu titik di pojok kanan atas berubah **hijau "Terhubung"**. Saat website baru "bangun", ini bisa memakan waktu 5–20 detik; tulisannya "Menyambungkan ke server…". Biarkan halaman terbuka: website terus mencoba dan otomatis beralih ke data server begitu tersambung.
 
 ### Membaca bagian atas dasbor
 
@@ -23,7 +23,7 @@ Panduan ini untuk **siapa saja**: petugas dapur SPPG, ahli gizi, guru, orang tua
 | **Sumber** | Muncul bila ada lebih dari satu sumber: *Simulasi* atau nama alat ESP32 (dengan keterangan online/offline) |
 | **Jam** | Waktu simulasi (misal *Hari 3, 14.20*), atau *Waktu nyata* untuk alat asli |
 | **Status proses** | ✓ hijau *Proses stabil* + skor 0–100; ! kuning *Perhatian*; ✕ merah *Bahaya* beserta nama masalahnya |
-| **Titik kanan atas** | Hijau = tersambung; kuning = mode demo; merah = terputus (dicoba ulang otomatis) |
+| **Titik kanan atas** | Hijau = tersambung; abu-abu = sedang menyambung; merah = terputus (dicoba ulang otomatis) |
 
 Enam kartu angka: suhu, pH, tekanan gas, isi drum gas, produksi biogas, dan kebocoran. Tiap kartu berlabel Normal / Waspada / Bahaya dengan garis tren kecil, diperbarui tiap ±2 detik.
 
@@ -61,7 +61,7 @@ Enam kartu angka: suhu, pH, tekanan gas, isi drum gas, produksi biogas, dan kebo
 
 1. Klik **Masuk** di pojok kanan atas.
 2. Isi **nama pengguna** dan **kata sandi** dari admin. Nama pengguna tidak membedakan huruf besar/kecil.
-3. Setelah masuk, tab **Kendali** muncul dan tombol **Asisten AI** bisa dipakai.
+3. Setelah masuk, tab **Kendali** muncul dan Asisten AI bisa menjalankan perintah kendali atas nama Anda.
 
 Belum punya akun? Klik **Masuk → Daftar akun baru**, isi data, lalu beri tahu admin agar akun Anda disetujui. **Lupa kata sandi?** Minta admin meresetnya.
 
@@ -83,11 +83,11 @@ Setiap tombol yang ditekan tercatat atas nama Anda di laporan admin.
 
 ### Asisten AI
 
-Klik **Asisten AI** di pojok kanan bawah (harus masuk dulu).
+Klik **Asisten AI** di pojok kanan bawah. Siapa pun bisa bertanya tanpa akun (dibatasi 15 pertanyaan per jam per browser). Petugas yang masuk juga bisa meminta asisten menjalankan perintah.
 
 - Tanya dengan bahasa sehari-hari: *"kenapa gas hari ini sedikit?"*, *"menu apa yang paling banyak tersisa?"*, *"hitung digester untuk 3.000 porsi"*.
-- Asisten bisa menjalankan perintah bila diminta jelas: *"tolong tambah buffer 300 gram"*.
-- **Asisten mengingat obrolan Anda** walaupun pindah perangkat. Menu **⋯** untuk melihat atau menghapus ingatan.
+- Setelah masuk dengan akun petugas, asisten bisa menjalankan perintah bila diminta jelas: *"tolong tambah buffer 300 gram"*.
+- **Asisten mengingat obrolan**: tanpa akun, ingatan tersimpan untuk browser itu; dengan akun, ingatan ikut ke HP maupun laptop. Menu **⋯** untuk melihat atau menghapus ingatan.
 - Jangan memasukkan data pribadi siswa (nama, alamat, NIK).
 
 ## 3. Menerima pemberitahuan di Telegram

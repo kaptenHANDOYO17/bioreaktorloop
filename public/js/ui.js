@@ -46,7 +46,10 @@ async function api(path, opt = {}) {
   let r;
   try { r = await fetch(path, o); } catch (e) { const err = new Error('Tidak bisa menghubungi server. Periksa koneksi internet.'); err.status = 0; throw err; }
   let j = null; try { j = await r.json(); } catch (e) { /* bukan JSON */ }
-  if (!r.ok) { const err = new Error((j && (j.message || j.error)) || ('Kesalahan ' + r.status)); err.status = r.status; err.data = j; throw err; }
+  if (!r.ok) {
+    const nice = { 502: 'Server sedang dimulai ulang. Coba lagi sebentar.', 503: 'Server sedang sibuk. Coba lagi sebentar.', 504: 'Server terlalu lama menjawab (504). Muat ulang halaman; bila berulang, buka menu Telegram & notifikasi → Cek koneksi.' }[r.status];
+    const err = new Error((j && (j.message || j.error)) || nice || ('Kesalahan ' + r.status)); err.status = r.status; err.data = j; throw err;
+  }
   return j;
 }
 function confirmBox(title, text, okLabel, danger) {

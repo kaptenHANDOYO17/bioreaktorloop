@@ -47,7 +47,7 @@ Kode yang sama juga berjalan di komputer sendiri: `server/index.js` menyajikan `
 
 ## Model proses (ringkas)
 
-Tiga kolam massa: partikulat → terlarut → asam lemak volatil (VFA) → metana (`public/js/sim.js`, dipakai server dan mode demo browser).
+Tiga kolam massa: partikulat → terlarut → asam lemak volatil (VFA) → metana (`public/js/sim.js`, dipakai server dan browser saat server belum tersambung).
 
 - Hidrolisis dan asidogenesis dipengaruhi suhu; metanogenesis dipengaruhi suhu (optimum ±36 °C), pH (6,0–8,6), natrium, dan hambatan VFA.
 - pH dari keseimbangan alkalinitas bikarbonat terhadap VFA dan CO₂.

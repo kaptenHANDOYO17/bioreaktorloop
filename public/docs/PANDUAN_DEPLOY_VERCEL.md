@@ -191,7 +191,7 @@ Untuk operasional resmi di banyak SPPG, pertimbangkan paket berbayar agar lebih 
 | "Akun dikunci 10 menit" | 5 kali salah kata sandi. Tunggu 10 menit |
 | Bot tidak membalas | Panel admin → Telegram → pastikan webhook **Terpasang** dan chat Anda **Disetujui** |
 | Webhook error "wrong response 401" | Webhook dipasang dengan alamat lama/preview. Klik **Pasang otomatis** di menu Telegram & notifikasi |
-| Website lambat / sering "Mode demo" | Server Vercel jauh dari database. `vercel.json` sudah berisi `"regions": ["syd1"]` (Sydney, cocok untuk Supabase `ap-southeast-2`). Untuk Supabase Singapura ganti ke `sin1` |
+| Website lambat / lama "Menyambungkan ke server" | Server Vercel jauh dari database. `vercel.json` sudah berisi `"regions": ["syd1"]` (Sydney, cocok untuk Supabase `ap-southeast-2`). Untuk Supabase Singapura ganti ke `sin1` |
 | Asisten menjawab "API key Gemini ditolak" | Kunci salah/terhapus. Buat baru di AI Studio, ganti di Vercel, Redeploy |
 | Asisten "Kuota Gemini sedang habis" | Batas tingkat gratis tercapai. Tunggu beberapa menit |
 | Workflow GitHub gagal (merah) | Secret `BIOLOOP_URL` salah ketik atau `CRON_SECRET` tidak sama dengan di Vercel |

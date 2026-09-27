@@ -12,6 +12,7 @@
    npm run bot -- kirim "Pesan pengumuman"   → kirim ke semua chat yang disetujui
    npm run bot -- status                     → kirim status reaktor sekarang ke semua chat
    npm run bot -- laporan                    → kirim laporan hari ini ke semua chat
+   npm run bot -- profil                     → pasang daftar perintah, deskripsi & info bot (pengganti BotFather)
 */
 const cfg = require('../lib/config');
 const db = require('../lib/db');
@@ -64,6 +65,7 @@ async function main() {
     }
     case 'status': console.log(`Terkirim ke ${await tg.broadcast(await tg.statusFor())} chat.`); break;
     case 'laporan': console.log(`Terkirim ke ${await tg.broadcast(await tg.dailyReport())} chat.`); break;
+    case 'profil': console.log('Profil bot diperbarui: ' + (await tg.setProfile()).join(', ') + '.\nBuka bot di Telegram, ketik "/" untuk melihat menu perintah.'); break;
     default:
       console.log(`Alat bot Telegram MBG-BIOLOOP
 
@@ -75,7 +77,8 @@ async function main() {
   npm run bot -- cabut <chat_id>                   cabut akses chat
   npm run bot -- kirim "isi pengumuman"            kirim pengumuman
   npm run bot -- status                            kirim status reaktor sekarang
-  npm run bot -- laporan                           kirim laporan hari ini`);
+  npm run bot -- laporan                           kirim laporan hari ini
+  npm run bot -- profil                            pasang menu perintah, deskripsi & info bot`);
   }
 }
 main().then(async () => { try { await db.close(); } catch (e) { /* abaikan */ } process.exit(0); })

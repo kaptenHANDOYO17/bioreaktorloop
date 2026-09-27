@@ -1,7 +1,7 @@
 /* =====================================================================
    MBG-BIOLOOP AI — logika dasbor
-   Mode server : data langsung dari server (SSE), kendali lewat API
-   Mode demo   : simulasi berjalan di browser bila server tidak ada
+   Mode server : data dari server (diambil berkala), kendali lewat API
+   Mode lokal  : model berjalan di browser selama server belum tersambung (atau file dibuka langsung)
    ===================================================================== */
 (function () {
 'use strict';
@@ -33,7 +33,7 @@ const INFO = {
   lel: ['Detektor kebocoran metana', () => `Sensor MQ-4 di dekat sambungan. Di atas 10% LEL muncul peringatan, di atas 20% LEL bahaya: matikan semua api dan tutup katup gas. Sekarang ${S.lel.toFixed(0)}% LEL.`],
   coil: ['Koil pemanas/pendingin', () => `Selang melingkar di dalam tangki. Air panas atau air dingin mengalir di dalamnya dan memindahkan panas lewat dinding selang (konduksi). Katup panas ${S.hot ? 'terbuka' : 'tertutup'}, katup dingin ${S.cold ? 'terbuka' : 'tertutup'}.`],
   solar: ['Pemanas air tenaga surya', () => 'Panel kolektor memanaskan air untuk koil di siang hari. Malam hari dibantu boiler biogas, jadi reaktor memanaskan dirinya sendiri.'],
-  hotwater: ['Tangki air panas', () => `Menyimpan air ±55 °C dari kolektor surya dan boiler. ${S.hotFail ? 'PEMANAS RUSAK (skenario uji).' : 'Pemanas berfungsi normal.'}`],
+  hotwater: ['Tangki air panas', () => `Menyimpan air ±55 °C dari kolektor surya dan boiler. ${S.hotFail ? 'PEMANAS RUSAK (skenario latihan).' : 'Pemanas berfungsi normal.'}`],
   boiler: ['Boiler biogas', () => `Membakar gas surplus saat drum hampir penuh dan kompor mati, sekaligus memanaskan air koil. Gas tidak terbuang ke udara. Status: ${S.boiler ? 'aktif' : 'siaga'}.`],
   coldwater: ['Tangki air dingin', () => 'Air ±24 °C untuk menurunkan suhu reaktor saat cuaca sangat terik. Katup dibuka otomatis bila suhu melewati batas atas.'],
   inlet: ['Bak pencampur umpan', () => `Sisa pangan dicacah, dicampur air 1:1, lalu dialirkan ke tangki. Kapasitas harian aman ±${S.set.feedKg} kg sisa pangan untuk modul 500 L. Total masuk ${S.cum.feed.toFixed(1)} kg.`],
@@ -119,7 +119,7 @@ const modalTitle = $('#modalTitle'), modalBody = $('#modalBody');
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#modal').hidden && !infoEl.hidden) APP.hideInfo(); });
 
 /* ---------- dokumen ---------- */
-const DOC_TITLES = { 'PANDUAN_PENGGUNA.md': 'Panduan pengguna', 'PANDUAN_ADMIN.md': 'Panduan admin', 'PANDUAN_TERMINAL.md': 'Perintah terminal', 'PANDUAN_DEPLOY_VERCEL.md': 'Panduan deploy', 'PANDUAN_SETUP.md': 'Panduan setup', 'ARSITEKTUR.md': 'Arsitektur sistem' };
+const DOC_TITLES = { 'PANDUAN_PENGGUNA.md': 'Panduan pengguna', 'PANDUAN_ADMIN.md': 'Panduan admin', 'PANDUAN_BOTFATHER.md': 'Template bot Telegram', 'PANDUAN_TERMINAL.md': 'Perintah terminal', 'PANDUAN_DEPLOY_VERCEL.md': 'Panduan deploy', 'PANDUAN_SETUP.md': 'Panduan setup', 'ARSITEKTUR.md': 'Arsitektur sistem' };
 async function openDoc(name) {
   openModal(DOC_TITLES[name] || name, '<p class="muted">Memuat dokumen…</p>');
   try {
@@ -134,14 +134,14 @@ async function openDoc(name) {
 $$('[data-doc]').forEach(b => b.addEventListener('click', () => openDoc(b.dataset.doc)));
 
 /* =====================================================================
-   KONEKSI SERVER / MODE DEMO
+   KONEKSI SERVER
    ===================================================================== */
 const connEl = $('#conn');
 function setConn(cls, text) { connEl.className = 'conn ' + cls; connEl.querySelector('span').textContent = text; }
 
-/* Server di Vercel bisa lambat saat "bangun" (cold start) dan database perlu waktu tersambung.
-   Karena itu: tunggu sampai 25 detik, coba 2 kali, dan bila tetap gagal tampilkan mode demo
-   sambil terus mencoba tiap 20 detik; begitu server menjawab, halaman beralih ke data server. */
+/* Server di Vercel bisa lambat saat "bangun" (cold start). Halaman menunggu, mencoba ulang,
+   dan selama menunggu model berjalan di browser supaya tampilan tidak kosong.
+   Begitu server menjawab, halaman beralih ke data server secara otomatis. */
 async function fetchHealth(ms) {
   const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), ms);
   try {
@@ -152,17 +152,20 @@ async function fetchHealth(ms) {
   } finally { clearTimeout(tm); }
 }
 async function detect() {
-  if (location.protocol === 'file:') return startDemo('file');
+  if (location.protocol === 'file:') return startLocal('file');
   setConn('', 'Menghubungkan…');
   for (let i = 0; i < 2; i++) {
-    try { return startServer(await fetchHealth(25000)); }
-    catch (e) { if (i === 0) setConn('', 'Server sedang bangun, tunggu sebentar…'); }
+    try { return startServer(await fetchHealth(20000)); }
+    catch (e) { if (i === 0) { setConn('', 'Menyambungkan ke server…'); await new Promise(r => setTimeout(r, 1500)); } }
   }
-  startDemo('noserver');
+  startLocal('wait');
+  let busyTry = false;
   const retry = setInterval(async () => {
-    try { const h = await fetchHealth(25000); clearInterval(retry); toast('ok', 'Tersambung ke server', 'Data sekarang diambil dari server.'); setTimeout(() => location.reload(), 1200); void h; }
-    catch (e) { /* coba lagi nanti */ }
-  }, 20000);
+    if (busyTry) return; busyTry = true;
+    try { await fetchHealth(20000); clearInterval(retry); location.reload(); }
+    catch (e) { /* coba lagi */ } finally { busyTry = false; }
+  }, 8000);
+  APPSTATE.retryNow = async () => { try { await fetchHealth(20000); location.reload(); } catch (e) { /* abaikan */ } };
 }
 
 /* Mode server: data diambil berkala (cocok untuk Vercel yang tidak mendukung koneksi terbuka lama). */
@@ -234,8 +237,8 @@ async function startServer(h) {
   }, 60000);
 }
 
-/* ---------- mode demo: simulasi di browser ---------- */
-const SRC = { auto: 'Kontrol otomatis', manual: 'Dasbor', jadwal: 'Jadwal harian', skenario: 'Skenario uji', habis: 'Gas habis', ai: 'Asisten AI' };
+/* ---------- mode lokal: model berjalan di browser ---------- */
+const SRC = { auto: 'Kontrol otomatis', manual: 'Dasbor', jadwal: 'Jadwal harian', skenario: 'Skenario latihan', habis: 'Gas habis', ai: 'Asisten AI' };
 const src = s => SRC[s] || s || '';
 function fmtLocal(e, d) {
   switch (e) {
@@ -255,7 +258,7 @@ function fmtLocal(e, d) {
       return { cat: 'sched', lvl: 'info', title: 'Smart bin: rekap sisa makan siang', body: `Total ${d.reduce((x, r) => x + r.w, 0).toFixed(1)} kg. Sisa tertinggi: ${top.n} (${(top.w / top.served * 100).toFixed(0)}% dari porsi).` }; }
     case 'drain': return { cat: 'action', lvl: 'info', title: 'Katup bawah dibuka', body: `${src(d.src)}. Menguras ${d.L.toFixed(0)} L endapan.` };
     case 'drainDone': return { cat: 'action', lvl: 'ok', title: 'Pengurasan selesai', body: `Endapan tersisa ${S.sludgeL.toFixed(0)} L. Keringkan/komposkan sebelum dipakai.` };
-    case 'scenario': return { cat: 'action', lvl: /^fix/.test(d.k) ? 'ok' : 'warn', title: (/^fix/.test(d.k) ? '' : 'Skenario uji: ') + (SIM.SCEN[d.k] || d.k), body: '' };
+    case 'scenario': return { cat: 'action', lvl: /^fix/.test(d.k) ? 'ok' : 'warn', title: (/^fix/.test(d.k) ? '' : 'Skenario latihan: ') + (SIM.SCEN[d.k] || d.k), body: '' };
     default: return null;
   }
 }
@@ -265,15 +268,14 @@ function localEmit(e, d) {
   if (e === 'feed') m.food = d.type;
   onEvent(m);
 }
-function startDemo(why) {
-  APPSTATE.mode = 'demo'; APPSTATE.srvMode = 'simulasi'; APPSTATE.speed = 600;
+function startLocal(why) {
+  APPSTATE.mode = 'local'; APPSTATE.localWhy = why; APPSTATE.srvMode = 'simulasi'; APPSTATE.speed = why === 'file' ? 600 : 60;
   SIM.setEmitter(localEmit); window.S = SIM.getS();
-  setConn('demo', 'Mode demo');
+  setConn(why === 'file' ? 'wait' : '', why === 'file' ? 'Tanpa server' : 'Menyambungkan ke server…');
   syncMode(); renderTele(); renderLog(true); updateUI(true);
   document.dispatchEvent(new CustomEvent('bioloop:health', { detail: null }));
-  if (why === 'file') toast('info', 'Mode demo', 'Halaman dibuka langsung dari file. Simulasi berjalan di browser; Telegram dan asisten AI butuh server.');
 }
-function demoControl(action, p) {
+function localControl(action, p) {
   const say = (ok, message) => ({ ok, message });
   switch (action) {
     case 'buffer': { const g = SIM.clamp(+p.grams || 300, 50, 3000); SIM.dose(g, 'manual'); return say(true, `${g} g NaHCO₃ sedang dipompa.`); }
@@ -297,9 +299,9 @@ function demoControl(action, p) {
 /* ---------- kendali terpadu ---------- */
 async function act(action, params = {}, quiet) {
   let r;
-  if (APPSTATE.mode !== 'server') r = demoControl(action, params);
+  if (APPSTATE.mode !== 'server') r = localControl(action, params);
   else {
-    if (!(await AUTH.require('Masuk dulu untuk mengendalikan bioreaktor. Tamu hanya bisa melihat.'))) return { ok: false };
+    if (!(await AUTH.require('Masuk dengan akun petugas untuk mengendalikan bioreaktor. Pengunjung umum bisa memantau dan bertanya ke asisten.'))) return { ok: false };
     try { r = await UI.api('api/control', { body: Object.assign({ action, source: APPSTATE.source }, params) }); }
     catch (e) { r = { ok: false, message: e.message }; if (e.status === 401) AUTH.refresh(); }
     poll(true);
@@ -468,26 +470,26 @@ function syncMode() {
   const note = $('#modeNote'), u = window.AUTH && AUTH.user;
   const src = APPSTATE.sources.find(s => s.id === APPSTATE.source);
   if (APPSTATE.mode === 'server') {
-    note.textContent = (APPSTATE.srvMode === 'sensor' ? `Data langsung dari perangkat ${src ? src.name : ''}` : 'Simulasi bersama di server') +
-      (u ? ` · Anda masuk sebagai ${u.name}` : ' · Mode tamu: hanya melihat. Masuk untuk mengendalikan dan bertanya ke asisten.');
-  } else note.textContent = 'Mode demo: simulasi berjalan di browser ini. Buka lewat alamat server untuk akun, Telegram, dan asisten AI.';
+    note.textContent = (APPSTATE.srvMode === 'sensor' ? `Data langsung dari perangkat ${src ? src.name : ''}` : 'Model bioreaktor (simulasi) berjalan di server, waktu nyata') +
+      (u ? ` · Anda masuk sebagai ${u.name}` : ' · Terbuka untuk umum. Petugas masuk untuk mengendalikan.');
+  } else note.textContent = APPSTATE.localWhy === 'file' ? 'Halaman dibuka tanpa server: angka dihitung di browser ini. Buka alamat website untuk akun, Telegram, dan asisten AI.' : 'Menyambungkan ke server… Sementara itu angka dihitung di browser ini dan akan diganti data server begitu tersambung.';
   const sensor = APPSTATE.srvMode === 'sensor';
   $$('.scen button, #btnFeed').forEach(b => { b.disabled = sensor; });
   $('#speed').disabled = sensor; $('#pause').disabled = sensor;
   /* Pembagian tampilan:
      - tamu (siapa pun): memantau grafik, sisa pangan, catatan, notifikasi, kalkulator;
      - pengguna terdaftar: + tab Kendali dan asisten AI;
-     - admin: + kecepatan simulasi, jeda, uji gangguan, mulai ulang.
-     Di mode demo (tanpa server) semuanya tampil karena simulasi hanya ada di browser ini. */
-  const demo = APPSTATE.mode !== 'server', admin = !!(u && u.role === 'admin');
-  $$('.only-admin').forEach(el => { el.hidden = !(demo || admin); });
-  $('#btnReset').hidden = !(demo || admin);
-  const canControl = demo || !!u, kb = $('#tabBtnKendali');
+     - admin: + kecepatan simulasi, jeda, skenario gangguan, mulai ulang.
+     File dibuka tanpa server: semuanya tampil karena model hanya ada di browser ini. */
+  const offline = APPSTATE.mode !== 'server' && APPSTATE.localWhy === 'file', admin = !!(u && u.role === 'admin');
+  $$('.only-admin').forEach(el => { el.hidden = !(offline || admin); });
+  $('#btnReset').hidden = !(offline || admin);
+  const canControl = offline || !!u, kb = $('#tabBtnKendali');
   kb.hidden = !canControl;
   if (!canControl && activeTab() === 'kendali') selectTab('grafik');
   if (canControl && !syncMode.shownCtl && u) { syncMode.shownCtl = true; selectTab('kendali'); }
   if (!u) syncMode.shownCtl = false;
-  $('#guestNote').hidden = demo || !!u;
+  $('#guestNote').hidden = APPSTATE.mode !== 'server' || !!u;
   $('#helpLogin').textContent = u ? `Akun: ${u.name}` : 'Masuk / daftar akun';
 }
 document.addEventListener('bioloop:auth', () => { syncMode(); renderTele(); });
@@ -558,7 +560,7 @@ function renderTele() {
   $('#teleAdmin').hidden = !admin;
   const bl = $('#botLink'), un = APPSTATE.mode === 'server' && t && t.username;
   bl.hidden = !un; if (un) { bl.href = 'https://t.me/' + encodeURIComponent(t.username); bl.textContent = `Buka bot @${t.username}`; }
-  if (APPSTATE.mode !== 'server') { el.className = 'tele-card off'; el.innerHTML = '<b>Telegram belum aktif</b><p>Website sedang di mode demo. Buka lewat alamat server agar bot bisa mengirim notifikasi.</p>'; return; }
+  if (APPSTATE.mode !== 'server') { el.className = 'tele-card off'; el.innerHTML = '<b>Menyambungkan ke server…</b><p>Status bot Telegram tampil setelah website tersambung ke server.</p>'; return; }
   if (!t || !t.enabled) { el.className = 'tele-card off'; el.innerHTML = '<b>Bot Telegram belum dipasang</b><p>Admin perlu mengisi <code>TELEGRAM_BOT_TOKEN</code> di pengaturan server (Vercel → Environment Variables).</p>'; return; }
   if (!t.username) { el.className = 'tele-card off'; el.innerHTML = `<b>Bot belum tersambung</b><p>${esc(t.error || 'Sedang menghubungkan ke Telegram…')}</p>`; return; }
   el.className = 'tele-card';
@@ -590,7 +592,7 @@ function updateUI(force) {
 let prev = performance.now();
 function loop(now) {
   const dt = Math.min(.1, (now - prev) / 1000); prev = now;
-  if (APPSTATE.mode === 'demo' && !APPSTATE.paused) {
+  if (APPSTATE.mode === 'local' && !APPSTATE.paused) {
     let h = dt * APPSTATE.speed / 3600, g = 0;
     while (h > 1e-9 && g < 400) { const d = Math.min(.02, h); SIM.step(d); h -= d; g++; }
     updateUI();

@@ -19,6 +19,14 @@ const ACT_LABEL = {
 };
 const isServer = () => window.APPSTATE && APPSTATE.mode === 'server';
 const user = () => window.AUTH && AUTH.user;
+/* Pengunjung tanpa akun tetap bisa bertanya; ingatannya disimpan per browser dengan kode acak ini. */
+let guestId = null;
+try { guestId = localStorage.getItem('bl_guest'); } catch (e) { /* abaikan */ }
+if (!/^[a-z0-9]{16,40}$/i.test(guestId || '')) {
+  guestId = Array.from(crypto.getRandomValues(new Uint8Array(12)), b => b.toString(16).padStart(2, '0')).join('');
+  try { localStorage.setItem('bl_guest', guestId); } catch (e) { /* abaikan */ }
+}
+const gq = () => user() ? '' : '?guestId=' + guestId;
 const timeStr = t => new Date(t || Date.now()).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 
 function scrollEnd() { body.scrollTop = body.scrollHeight; }
@@ -45,32 +53,24 @@ function welcome() {
   const u = user();
   bubble('bot', `Halo${u ? ' ' + u.name : ''}! Saya **Asisten BIOLOOP**. Saya bisa membaca sensor bioreaktor, menjelaskan kenapa pH turun atau gas berkurang, menghitung kebutuhan SPPG Anda, dan menjalankan perintah seperti menambah buffer.\n\nSaya juga mengingat obrolan kita sebelumnya. Mau mulai dari mana?`, { at: false });
 }
-function loginCard() {
-  body.innerHTML = '';
-  const el = document.createElement('div'); el.className = 'chat-login';
-  el.innerHTML = `<img src="img/logo.svg" alt="" width="56" height="56"><b>Masuk untuk mengobrol</b><p>Asisten menyimpan ingatan per akun, jadi obrolan Anda tetap ada di HP maupun laptop.</p><button class="btn btn-gold">Masuk / daftar</button>`;
-  el.querySelector('button').addEventListener('click', () => AUTH.openLogin('Masuk untuk memakai asisten AI.'));
-  body.appendChild(el);
-  chips.hidden = true; form.hidden = true;
-}
 
 function updateSub() {
-  if (!isServer()) { sub.textContent = 'Mode demo · asisten butuh server'; return; }
+  if (!isServer()) { sub.textContent = 'Menyambungkan ke server…'; return; }
   const ai = health && health.ai;
-  if (!user()) { sub.textContent = 'Masuk untuk memakai asisten'; return; }
-  sub.textContent = ai && ai.enabled ? `Gemini · ingat percakapan ${user().name}` : 'Gemini belum diaktifkan admin';
+  if (ai && !ai.enabled) { sub.textContent = 'Asisten belum diaktifkan admin'; return; }
+  sub.textContent = user() ? `Gemini · ingat percakapan ${user().name}` : 'Gemini · pengunjung umum';
 }
 document.addEventListener('bioloop:health', e => { health = e.detail; updateSub(); });
 document.addEventListener('bioloop:auth', () => { updateSub(); if (!chat.hidden) load(true); else loadedFor = undefined; });
 
 async function load(force) {
-  const key = isServer() ? (user() ? user().id : null) : 'demo';
+  const key = isServer() ? (user() ? user().id : 'g') : 'local';
   if (!force && loadedFor === key) return; loadedFor = key;
   chips.hidden = false; form.hidden = false; body.innerHTML = '';
-  if (!isServer()) { welcome(); bubble('sys', 'Mode demo: buka website lewat alamat server (Vercel atau localhost) agar asisten bisa menjawab.'); return; }
-  if (!user()) return loginCard();
+  if (!isServer()) { welcome(); bubble('sys', 'Menyambungkan ke server… Asisten bisa menjawab begitu tersambung.'); loadedFor = undefined; return; }
   try {
-    const h = await api('api/chat/history');
+    const h = await api('api/chat/history' + gq());
+    if (!user() && !(h.messages && h.messages.length)) { welcome(); bubble('sys', 'Anda bertanya sebagai pengunjung. Masuk dengan akun petugas agar asisten bisa menjalankan perintah kendali.'); return; }
     if (h.summary || (h.messages && h.messages.length)) {
       if (h.total > h.messages.length) bubble('sys', `${h.total - h.messages.length} pesan lama sudah diringkas ke ingatan asisten`);
       h.messages.forEach(m => bubble(m.r === 'user' ? 'user' : 'bot', m.text, { at: m.at }));
@@ -81,12 +81,11 @@ async function load(force) {
 
 async function send(text) {
   text = String(text || '').trim(); if (!text || busy) return;
-  if (isServer() && !user()) { if (!(await AUTH.require('Masuk untuk memakai asisten AI.'))) return; }
   bubble('user', text); input.value = ''; autosize();
-  if (!isServer()) { bubble('sys', 'Asisten AI butuh server. Lihat panduan deploy.'); return; }
+  if (!isServer()) { bubble('sys', 'Masih menyambungkan ke server. Tunggu beberapa detik lalu kirim lagi.'); if (window.APPSTATE && APPSTATE.retryNow) APPSTATE.retryNow(); return; }
   busy = true; sendBtn.disabled = true; const t = typing();
   try {
-    const j = await api('api/chat', { body: { message: text, source: window.APPSTATE && APPSTATE.source } });
+    const j = await api('api/chat', { body: { message: text, source: window.APPSTATE && APPSTATE.source, guestId: user() ? undefined : guestId } });
     t.remove();
     bubble('bot', j.reply || '(tidak ada jawaban)', { actions: j.actions, err: !!j.error });
     if (j.actions && j.actions.some(a => !/^lihat_|^hitung_|^ingat_/.test(a.name))) toast('ok', 'Asisten menjalankan perintah', j.actions.map(a => ACT_LABEL[a.name] || a.name).join(', '));
@@ -114,19 +113,19 @@ document.addEventListener('click', e => { if (!menuBox.hidden && !menuBox.contai
 
 $('#chatMemory').addEventListener('click', async () => {
   menuBox.hidden = true;
-  if (!isServer() || !user()) return openModal('Ingatan asisten', '<p>Ingatan disimpan per akun di server. Masuk terlebih dahulu untuk melihatnya.</p>');
+  if (!isServer()) return openModal('Ingatan asisten', '<p>Ingatan tampil setelah website tersambung ke server.</p>');
   try {
-    const h = await api('api/chat/history');
+    const h = await api('api/chat/history' + gq());
     const facts = h.facts && h.facts.length ? `<ul>${h.facts.map(f => `<li>${esc(f)}</li>`).join('')}</ul>` : '<p class="muted">Belum ada fakta khusus. Katakan misalnya "ingat, SPPG kami melayani 3.000 porsi".</p>';
     const sum = h.summary ? `<p>${esc(h.summary)}</p>` : '<p class="muted">Belum ada ringkasan. Ringkasan dibuat otomatis saat obrolan sudah panjang.</p>';
-    openModal('Yang diingat asisten', `<div class="mem"><p>Total <b>${h.total || 0}</b> pesan tersimpan untuk akun <b>${esc(user().username)}</b>. Pesan terbaru dikirim utuh ke Gemini, yang lebih lama diringkas.</p><h5>Fakta tentang Anda</h5>${facts}<h5>Ringkasan obrolan lama</h5>${sum}</div>`);
+    openModal('Yang diingat asisten', `<div class="mem"><p>Total <b>${h.total || 0}</b> pesan tersimpan untuk ${user() ? `akun <b>${esc(user().username)}</b>` : 'browser ini'}. Pesan terbaru dikirim utuh ke Gemini, yang lebih lama diringkas.</p><h5>Fakta tentang Anda</h5>${facts}<h5>Ringkasan obrolan lama</h5>${sum}</div>`);
   } catch (e) { toast('bad', 'Gagal memuat ingatan', e.message); }
 });
 $('#chatForget').addEventListener('click', async () => {
   menuBox.hidden = true;
-  if (!isServer() || !user()) return;
-  if (!(await confirmBox('Lupakan percakapan?', 'Semua pesan, ringkasan, dan fakta yang diingat asisten untuk akun Anda akan dihapus. Tindakan ini tidak bisa dibatalkan.', 'Hapus ingatan', true))) return;
-  try { await api('api/chat/forget', { body: {} }); } catch (e) { /* abaikan */ }
+  if (!isServer()) return;
+  if (!(await confirmBox('Lupakan percakapan?', 'Semua pesan, ringkasan, dan fakta yang diingat asisten untuk ' + (user() ? 'akun Anda' : 'browser ini') + ' akan dihapus. Tindakan ini tidak bisa dibatalkan.', 'Hapus ingatan', true))) return;
+  try { await api('api/chat/forget', { body: { guestId: user() ? undefined : guestId } }); } catch (e) { /* abaikan */ }
   body.innerHTML = ''; welcome(); bubble('sys', 'Ingatan dihapus. Kita mulai dari awal.');
 });
 })();

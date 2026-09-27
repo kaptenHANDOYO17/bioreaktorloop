@@ -51,6 +51,7 @@ mbg-bioloop/
 - **[Menyelesaikan pemasangan (mulai dari sini)](public/docs/PANDUAN_SELESAIKAN.md)**
 - [Panduan pengguna umum](public/docs/PANDUAN_PENGGUNA.md)
 - [Panduan admin](public/docs/PANDUAN_ADMIN.md)
+- [Template pengaturan bot Telegram (BotFather & notifikasi)](public/docs/PANDUAN_BOTFATHER.md)
 - [Menjalankan di komputer sendiri](public/docs/PANDUAN_SETUP.md)
 - [Perintah terminal tanpa file .bat (Windows/VS Code, macOS, Linux)](public/docs/PANDUAN_TERMINAL.md)
 - [Arsitektur, API, database, keamanan](public/docs/ARSITEKTUR.md)
@@ -58,7 +59,7 @@ mbg-bioloop/
 
 ## Catatan penting
 
-- **Akun mudah** (`Handoyo/12345`, `admin/admin123`, `petugas/petugas123`, `gizi/gizi123`, `guru/guru123`) hanya untuk uji coba. Ganti kata sandinya sebelum dipakai sungguhan.
+- **Akun mudah** (`Handoyo/12345`, `admin/admin123`, `petugas/petugas123`, `gizi/gizi123`, `guru/guru123`) bersifat sementara. Ganti kata sandinya sebelum website dibagikan.
 - Jangan unggah file `.env`. Token Telegram, kunci Gemini, dan `DATABASE_URL` hanya disimpan di Environment Variables.
 - Tingkat gratis Gemini: data dapat dipakai Google untuk pengembangan produk; jangan memasukkan data pribadi siswa.
 - Angka mode simulasi berasal dari model literatur, bukan hasil kalibrasi alat. Desain digester akhir perlu uji potensi metana (BMP) sisa pangan setempat.

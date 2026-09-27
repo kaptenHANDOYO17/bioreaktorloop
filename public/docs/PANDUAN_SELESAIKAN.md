@@ -56,7 +56,7 @@ Untuk melihat semua akun kapan saja:
 npm run akun -- daftar
 ```
 
-> Kata sandi di atas sengaja mudah untuk uji coba. Setelah semuanya berjalan, ganti kata sandi admin dan nonaktifkan akun yang tidak dipakai (lihat Panduan admin).
+> Kata sandi di atas sengaja mudah supaya cepat dipakai. Setelah semuanya berjalan, ganti kata sandi admin dan nonaktifkan akun yang tidak dipakai (lihat Panduan admin).
 
 ## Langkah 4: Kirim pembaruan ke GitHub (Vercel ikut memperbarui)
 
@@ -76,7 +76,7 @@ git push
 
 Bila diminta masuk GitHub, masuk dan izinkan. Buka **vercel.com → proyek bioreaktorloop → Deployments**. Dalam ±1 menit muncul deployment baru berstatus **Ready**.
 
-> Pembaruan ini juga memindahkan server Vercel ke **Sydney (syd1)**, dekat database Supabase Anda, sehingga website jauh lebih cepat dan tidak lagi jatuh ke "Mode demo". Bila suatu saat database Anda di Singapura, ganti `syd1` menjadi `sin1` di file `vercel.json`.
+> Pembaruan ini juga memindahkan server Vercel ke **Sydney (syd1)**, dekat database Supabase Anda, sehingga website jauh lebih cepat tersambung. Bila suatu saat database Anda di Singapura, ganti `syd1` menjadi `sin1` di file `vercel.json`.
 
 Tidak memakai git? Buka repositori di github.com → **Add file → Upload files** → seret semua file dan folder **kecuali** `.env`, `node_modules`, dan `data` → **Commit changes**.
 
@@ -92,12 +92,14 @@ Catatan: halaman panel admin memang kosong sebelum masuk. Isinya baru muncul set
 
 Webhook bot **dipasang otomatis** oleh website. Untuk memastikan:
 
-1. Panel admin → menu **Telegram & notifikasi**. Kotak **Webhook** harus hijau *Terpasang ke https://bioreaktorloop.vercel.app/api/telegram/webhook*. Bila belum, klik **Pasang otomatis**.
+1. Panel admin → menu **Telegram & notifikasi** → klik **Cek koneksi**. Database, Bot Telegram, Webhook, dan Asisten Gemini harus ✓. Lalu klik **Atur profil & menu bot**. Kotak **Webhook** harus hijau *Terpasang ke https://bioreaktorloop.vercel.app/api/telegram/webhook*. Bila belum, klik **Pasang otomatis**.
 2. Di HP buka Telegram → cari **@Bioreaktorloop_bot** → tekan **Start**. Bot membalas "menunggu persetujuan admin".
 3. Kembali ke panel admin → muat ulang halaman (F5) → pada tabel **Chat yang memakai bot**, klik **Setujui** di chat Anda.
 4. Di Telegram ketik `/status`. Bot membalas ringkasan reaktor. Coba juga `/laporan` dan tanya "kenapa pH bisa turun?".
 
 Ulangi langkah 2–3 untuk setiap petugas atau grup.
+
+Nama dan foto bot diatur di **@BotFather** dengan teks siap salin di panduan **Template pengaturan bot Telegram** (menu Panduan di panel admin).
 
 Cara lain lewat terminal (bila panel belum bisa dibuka):
 
@@ -134,7 +136,13 @@ Panel admin → **Telegram & notifikasi**:
 2. Kartu **Kirim sekarang**: klik **📊 Status reaktor** untuk mencoba. Pesan masuk ke Telegram Anda.
 3. Kartu **Jadwal pesan otomatis** → **+ Tambah jadwal** → misalnya *Laporan hari ini*, jam `15:00`, hari Sen–Sab → **Simpan jadwal**.
 
-## Langkah 9: Amankan
+## Langkah 9: Isi riwayat 30 hari (ringkasan & laporan terisi)
+
+Panel admin → **Pengaturan** → kartu **Data riwayat** → **Isi riwayat 30 hari** → **Isi sekarang**. Tunggu beberapa detik. Buka lagi **Ringkasan** dan **Laporan**: grafik 7 hari, peringatan, dan aktivitas pengguna sudah terisi. Data ini dari model bioreaktor dan tetap berlabel *Simulasi*.
+
+Lewat terminal: `npm run data -- isi`
+
+## Langkah 10: Amankan
 
 1. Klik nama Anda (kanan atas) → **Ganti kata sandi**. Pakai kata sandi yang hanya Anda tahu.
 2. Menu **Pengguna**: nonaktifkan akun mudah yang tidak dipakai (`guru`, `gizi`, …) atau reset kata sandinya.
@@ -149,7 +157,7 @@ Panel admin → **Telegram & notifikasi**:
 | `npm run akun` menulis "berkas lokal" | File `.env` belum berisi `DATABASE_URL`. Salin dari Vercel |
 | Masuk ditolak walau sudah `npm run akun -- awal` | Database di `.env` berbeda dengan di Vercel (lihat Langkah 3) |
 | "Akun dikunci 10 menit" | Jalankan `npm run akun -- sandi Handoyo 12345` untuk membuka kunci |
-| Website masih "Mode demo" | Tunggu ±20 detik; halaman beralih sendiri. Pastikan deployment terbaru **Ready** di Vercel |
+| Website lama "Menyambungkan ke server" | Tunggu ±20 detik; halaman beralih sendiri. Pastikan deployment terbaru **Ready** di Vercel. Panel admin → **Cek koneksi** menunjukkan bagian yang bermasalah |
 | Bot tidak membalas | Panel admin → Telegram & notifikasi → **Pasang otomatis**, lalu pastikan chat Anda **Disetujui** |
 | Bot membalas "menunggu persetujuan" terus | Chat belum disetujui. Setujui di panel atau `npm run bot -- setujui <chat id>` |
 | Notifikasi tidak datang | Cek item cron di Ringkasan; cek chat berstatus *Notifikasi: Aktif* |

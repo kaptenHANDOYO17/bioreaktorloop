@@ -1,6 +1,6 @@
 # Menjalankan di komputer sendiri (laptop, Raspberry Pi, VPS)
 
-Panduan ini untuk menjalankan MBG-BIOLOOP **di komputer sendiri**, misalnya untuk uji coba di laptop atau server di dapur SPPG. Untuk online lewat internet dengan GitHub + Vercel, baca **Panduan deploy (GitHub + Vercel)**. Panduan ini juga untuk Anda yang **belum pernah memrogram**. Ikuti urutannya, satu langkah selesai baru lanjut. Waktu yang dibutuhkan ±30 menit.
+Panduan ini untuk menjalankan MBG-BIOLOOP **di komputer sendiri**, misalnya di laptop atau server di dapur SPPG. Untuk online lewat internet dengan GitHub + Vercel, baca **Panduan deploy (GitHub + Vercel)**. Panduan ini juga untuk Anda yang **belum pernah memrogram**. Ikuti urutannya, satu langkah selesai baru lanjut. Waktu yang dibutuhkan ±30 menit.
 
 Yang Anda perlukan:
 
@@ -136,7 +136,7 @@ Peringatan Telegram hanya terkirim selama server menyala. Pilihan:
 
 | Pilihan | Cocok untuk | Catatan |
 |---|---|---|
-| Laptop/PC di dapur | Uji coba | Matikan mode *sleep* di pengaturan daya |
+| Laptop/PC di dapur | Pemakaian awal | Matikan mode *sleep* di pengaturan daya |
 | Raspberry Pi 4/5 | Pemasangan permanen murah | Pasang Node.js LTS, jalankan `./start-mac-linux.sh` |
 | VPS (server sewaan) | Diakses dari mana saja | Pakai Docker (di bawah) dan pasang HTTPS |
 
@@ -214,7 +214,7 @@ Rangkaian sensor dan relay dijelaskan di `ARSITEKTUR.md`.
 | Asisten menjawab kunci tidak valid (401/403) | Buat kunci baru di AI Studio dan pastikan tidak ada spasi tambahan |
 | Asisten menjawab kuota habis (429) | Batas tingkat gratis tercapai. Tunggu beberapa menit |
 | Model tidak ditemukan (404) | Nama model sudah diganti Google. Cek daftar di ai.google.dev/gemini-api/docs/models, ubah `GEMINI_MODEL` |
-| Website "Mode demo" | Halaman dibuka langsung dari file, bukan lewat `http://localhost:3000` |
+| Website menulis "Tanpa server" | Halaman dibuka langsung dari file, bukan lewat `http://localhost:3000` |
 | Model 3D tidak muncul | Browser/komputer tidak mendukung WebGL. Data dan kendali tetap berfungsi. Coba Chrome terbaru |
 | Tombol kendali meminta masuk | Masuk dengan akun Anda; tamu hanya bisa melihat |
 | `npm` tidak dikenal | Node.js belum terpasang lengkap; pasang ulang versi LTS |

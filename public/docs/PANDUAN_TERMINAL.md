@@ -243,8 +243,19 @@ npm run bot -- lepas
 | `kirim "teks"` | Pengumuman ke semua chat yang disetujui |
 | `status` / `laporan` | Kirim status reaktor / laporan hari ini sekarang |
 | `lepas` | Lepas webhook (misalnya untuk mencoba bot di komputer sendiri) |
+| `profil` | Pasang menu perintah "/", deskripsi, dan info singkat bot |
 
 Biasanya Anda tidak perlu `pasang`: website memasang webhook otomatis. Jangan menempel token ke chat, grup, atau tangkapan layar. Bila terlanjur, buka @BotFather → `/revoke`.
+
+### 2.3b Data riwayat 30 hari (`npm run data`)
+
+```
+npm run data -- isi
+npm run data -- status
+npm run data -- hapus
+```
+
+Mengisi ringkasan, grafik, laporan, dan aktivitas pengguna dengan riwayat 30 hari dari model bioreaktor (sumber *Simulasi*). Sama dengan tombol **Pengaturan → Data riwayat** di panel admin.
 
 ### 2.4 Menghapus data lokal (mulai dari awal)
 
@@ -319,6 +330,8 @@ Atau pakai port lain: tambahkan `PORT=3001` di `.env`, lalu buka `http://localho
 | Reset admin | `ADMIN_RESET_PASSWORD='<sandi sementara>' npm start` |
 | Akun mudah / lupa sandi | `npm run akun -- awal` · `npm run akun -- sandi Handoyo 12345` |
 | Bot Telegram | `npm run bot -- info` · `npm run bot -- chat` · `npm run bot -- setujui <chat id>` |
+| Profil bot | `npm run bot -- profil` |
+| Riwayat 30 hari | `npm run data -- isi` · `npm run data -- hapus` |
 | Cari proses di port 3000 | `lsof -i :3000` lalu `kill <PID>` |
 
 ---

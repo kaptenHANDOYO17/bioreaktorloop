@@ -1,6 +1,6 @@
 /* =====================================================================
    MBG-BIOLOOP AI — MESIN SIMULASI BIOREAKTOR FLOATING DRUM (±500 L)
-   Dipakai bersama oleh server (Node.js) dan website (mode demo).
+   Dipakai bersama oleh server (Node.js) dan website (saat server belum tersambung).
    Model 3 kolam: partikulat -> terlarut -> VFA -> CH4.
    Parameter rujukan (lihat docs/Data_Penelitian_MBG_BIOLOOP.xlsx):
    - Mesofilik 35 °C, toleransi ±3 °C (Mapantsela dkk. 2024)

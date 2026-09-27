@@ -14,7 +14,7 @@ Halaman depan website sengaja hanya berisi informasi untuk umum. Semua yang khus
 | **Pengaturan** | Nama SPPG, harga LPG, pendaftaran, tamu, cron, kata sandi Anda |
 | **Panduan** | Semua panduan, bisa dibaca langsung di panel |
 
-Di halaman dasbor, admin juga melihat alat khusus admin: **kecepatan simulasi, jeda, uji gangguan, dan mulai ulang**. Pengunjung umum tidak melihat tombol-tombol itu.
+Di halaman dasbor, admin juga melihat alat khusus admin: **kecepatan simulasi, jeda, skenario gangguan (latihan), dan mulai ulang**. Pengunjung umum tidak melihat tombol-tombol itu.
 
 ## 1. Akun
 
@@ -30,7 +30,7 @@ Setelah menjalankan `npm run akun -- awal` (lihat *Menyelesaikan pemasangan*), a
 | `gizi` | `gizi123` | pengguna |
 | `guru` | `guru123` | pengguna |
 
-> **Kata sandi ini mudah ditebak.** Pakai untuk uji coba. Sebelum website dipakai sungguhan, ganti kata sandi admin (klik nama Anda → *Ganti kata sandi*) dan nonaktifkan akun yang tidak dipakai di menu **Pengguna**.
+> **Kata sandi ini mudah ditebak.** Pakai sementara saja. Sebelum website dibagikan, ganti kata sandi admin (klik nama Anda → *Ganti kata sandi*) dan nonaktifkan akun yang tidak dipakai di menu **Pengguna**.
 
 ### Mengelola akun lewat panel
 
@@ -76,6 +76,11 @@ Kartu paling atas menunjukkan apa yang masih kurang. Tanda ✓ hijau berarti ber
 
 ## 3. Telegram & notifikasi
 
+### Cek koneksi & profil bot
+
+- **Cek koneksi** (kartu Bot) memeriksa database, bot Telegram, webhook, asisten Gemini, dan cron sekaligus, lengkap dengan lama waktunya. Pakai ini pertama kali bila ada yang tidak jalan (misalnya halaman menampilkan *Server terlalu lama menjawab (504)*).
+- **Atur profil & menu bot** memasang menu perintah "/", deskripsi, dan info singkat bot tanpa membuka @BotFather. Nama dan foto bot tetap lewat @BotFather; teks siap salin ada di **Template pengaturan bot Telegram** (menu Panduan).
+
 ### Webhook
 
 Webhook adalah "alamat balasan" bot. Website memasangnya **otomatis** setiap kali panel admin dibuka atau cron berjalan, memakai alamat produksi (`https://…vercel.app`). Bila kotak Webhook tidak hijau, klik **Pasang otomatis**. Tombol *Pasang ke alamat di atas* untuk alamat khusus (misalnya domain sendiri).
@@ -84,7 +89,7 @@ Webhook adalah "alamat balasan" bot. Website memasangnya **otomatis** setiap kal
 
 1. Orang membuka bot → **Start**. Chatnya muncul di tabel dengan status **Menunggu**.
 2. Klik **Setujui**. Bot mengirim pesan "sudah disetujui".
-3. Per chat Anda bisa: *Matikan/Nyalakan notifikasi*, *Kirim uji*, *Cabut*, *Hapus*.
+3. Per chat Anda bisa: *Matikan/Nyalakan notifikasi*, *Kirim pesan tes*, *Cabut*, *Hapus*.
 
 ### Notifikasi otomatis
 
@@ -154,7 +159,17 @@ npm run bot -- pasang https://bioreaktorloop.vercel.app
 
 Bagian **Cron & alamat penting** berisi alamat cron (untuk GitHub Actions/cron-job.org), alamat sensor ESP32, dan tombol **Jalankan cron sekarang**.
 
-## 7. Kebiasaan aman
+## 7. Data riwayat (mengisi ringkasan & laporan)
+
+Menu **Pengaturan → Data riwayat → Isi riwayat 30 hari** mengisi 30 hari terakhir dari **model bioreaktor** (sumber *Simulasi*): pembacaan tiap 15 menit, jadwal umpan & kompor, rekap smart bin, beberapa peringatan (endapan penuh, media scrubber jenuh, gas habis), dan aktivitas petugas. Hasilnya langsung tampil di Ringkasan, grafik 7 hari, Laporan, Excel, dan *Aktivitas pengguna*.
+
+- Riwayat simulasi lama diganti; data alat ESP32 asli, akun, dan chat Telegram tidak dihapus.
+- Simulasi di dasbor dilanjutkan dengan **jam nyata** (kecepatan 1×), jadi jam di dasbor sama dengan jam dinding.
+- Menambah 3 akun pengguna (`siti`, `rahmat`, `dewi`) dengan kata sandi acak. Reset kata sandinya di menu Pengguna bila ingin dipakai.
+- Semua tetap berlabel **Simulasi**, dan laporan Excel mencantumkan bahwa data simulasi berasal dari model, bukan pengukuran alat.
+- **Hapus riwayat** menghapus lagi semuanya. Lewat terminal: `npm run data -- isi` / `npm run data -- hapus`.
+
+## 8. Kebiasaan aman
 
 - Ganti kata sandi mudah sebelum website dipakai sungguhan. Jangan menuliskannya di grup.
 - Setujui hanya chat Telegram dan akun yang Anda kenal. Nonaktifkan akun petugas yang pindah tugas.
