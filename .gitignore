@@ -1,0 +1,8 @@
+.env
+.env.local
+data/*
+!data/.gitkeep
+node_modules/
+.vercel
+.DS_Store
+*.zip

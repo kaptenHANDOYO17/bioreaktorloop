@@ -1,0 +1,22 @@
+# Memanggil /api/cron tiap 5 menit supaya simulasi, cek perangkat diam, dan laporan Telegram
+# tetap berjalan di Vercel paket gratis (cron Vercel Hobby hanya sekali sehari).
+# Isi di GitHub: Settings → Secrets and variables → Actions → New repository secret
+#   BIOLOOP_URL  = https://nama-proyek-anda.vercel.app   (tanpa garis miring di akhir)
+#   CRON_SECRET  = sama dengan CRON_SECRET di Vercel (boleh kosong bila tidak dipakai)
+name: BIOLOOP cron
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Panggil /api/cron
+        env:
+          URL: ${{ secrets.BIOLOOP_URL }}
+          KEY: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$URL" ]; then echo "Secret BIOLOOP_URL belum diisi, lewati."; exit 0; fi
+          curl -fsS --max-time 90 -H "Authorization: Bearer ${KEY}" "${URL%/}/api/cron"

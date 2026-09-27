@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MBG-BIOLOOP AI | Bioreaktor Sisa Pangan untuk Dapur SPPG</title>
+<meta name="description" content="Sisa makan siang program Makan Bergizi Gratis diolah menjadi biogas untuk dapur SPPG dan pupuk organik, dipantau sensor IoT dan asisten AI.">
+<meta name="theme-color" content="#7A1020">
+<link rel="icon" href="img/logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<a class="skip" href="#dasbor">Langsung ke dasbor</a>
+
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="#beranda" aria-label="MBG-BIOLOOP AI, ke beranda">
+      <img src="img/logo.svg" alt="" width="36" height="36">
+      <span><b>MBG-BIOLOOP</b><small id="siteName">SPPG Contoh</small></span>
+    </a>
+    <nav class="links" aria-label="Navigasi utama">
+      <a href="#cara-kerja">Cara kerja</a><a href="#dasbor">Dasbor</a><a href="#data">Data &amp; bukti</a><a href="#panduan">Panduan</a>
+    </nav>
+    <div class="nav-right">
+      <span class="conn" id="conn" title="Status koneksi server"><i></i><span>Menghubungkan…</span></span>
+      <button class="btn btn-gold sm" data-open-chat>Tanya asisten</button>
+      <div id="authBox" class="auth-box"></div>
+    </div>
+  </div>
+</header>
+
+<main>
+<!-- ================= HERO ================= -->
+<section class="hero" id="beranda">
+  <svg class="kawung" aria-hidden="true"><defs><pattern id="kw" width="56" height="56" patternUnits="userSpaceOnUse">
+    <g fill="none" stroke="currentColor" stroke-width="1.2"><ellipse cx="28" cy="14" rx="7" ry="12"/><ellipse cx="28" cy="42" rx="7" ry="12"/><ellipse cx="14" cy="28" rx="12" ry="7"/><ellipse cx="42" cy="28" rx="12" ry="7"/><circle cx="28" cy="28" r="2.2"/></g>
+  </pattern></defs><rect width="100%" height="100%" fill="url(#kw)"/></svg>
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="ribbon"><span>Menuju Indonesia Emas 2045</span><b id="yearsLeft">19 tahun lagi</b></p>
+      <h1>Sisa makan siang hari ini, api dapur SPPG esok pagi.</h1>
+      <p class="lede">MBG-BIOLOOP mengolah sisa pangan program Makan Bergizi Gratis menjadi biogas untuk kompor dapur SPPG dan pupuk untuk kebun sekolah. Sensor menjaga reaktor, AI membaca pola sisa makanan, dan Telegram mengabari petugas.</p>
+      <div class="cta">
+        <a class="btn btn-gold" href="#dasbor">Buka dasbor langsung</a>
+        <button class="btn btn-ghost" data-open-chat>Ngobrol dengan asisten AI</button>
+      </div>
+      <dl class="facts">
+        <div><dt>1,1–1,4 juta ton</dt><dd>sisa makanan program MBG per tahun<cite>Kajian Bappenas 2024, via Bapanas</cite></dd></div>
+        <div><dt>±40%</dt><dd>sampah Indonesia berupa sisa makanan<cite>SIPSN KLH 2024–2025</cite></dd></div>
+        <div><dt>84%</dt><dd>kebutuhan LPG nasional dari impor<cite>Ditjen Migas ESDM, Jan–Feb 2026</cite></dd></div>
+      </dl>
+    </div>
+    <figure class="loop" aria-label="Siklus BIOLOOP: sisa pangan, bioreaktor, biogas, dapur SPPG, pupuk, kebun sekolah">
+      <svg viewBox="0 0 420 420" id="loopSvg">
+        <circle cx="210" cy="210" r="150" class="loop-track"/>
+        <circle cx="210" cy="210" r="150" class="loop-glow" id="loopGlow"/>
+        <circle r="7" class="loop-dot" id="loopDot" cx="210" cy="60"/>
+        <g class="loop-center"><text x="210" y="196" class="lc-k">BIOLOOP</text><text x="210" y="226" class="lc-v" id="loopVal">0,00 m³</text><text x="210" y="248" class="lc-s">produksi biogas per hari</text></g>
+      </svg>
+      <ol class="loop-nodes" id="loopNodes"></ol>
+    </figure>
+  </div>
+</section>
+
+<!-- ================= CARA KERJA ================= -->
+<section class="sec" id="cara-kerja">
+  <div class="wrap">
+    <div class="sec-head"><h2>Satu siklus, enam langkah</h2><p>Setiap langkah punya sensor atau data yang bisa diperiksa. Tidak ada yang terbuang tanpa tercatat.</p></div>
+    <ol class="steps">
+      <li><span class="n">1</span><h3>Nampan difoto</h3><p>Kamera di smart bin memotret nampan sebelum dan sesudah makan. Computer vision memperkirakan menu apa yang tersisa dan berapa banyak.</p></li>
+      <li><span class="n">2</span><h3>Menu diperbaiki</h3><p>Data sisa per menu jadi bahan evaluasi porsi dan resep. Sisa terbaik adalah sisa yang tidak pernah ada.</p></li>
+      <li><span class="n">3</span><h3>Sisa masuk bioreaktor</h3><p>Sisa yang tetap ada dicampur air dan dicerna bakteri anaerob pada suhu ±35 °C di tangki ±500 L.</p></li>
+      <li><span class="n">4</span><h3>Biogas ke dapur</h3><p>Drum mengapung menampung gas. Setelah scrubber H₂S dan pengaman api, biogas menyalakan kompor SPPG.</p></li>
+      <li><span class="n">5</span><h3>Endapan jadi pupuk</h3><p>Katup bawah mengeluarkan endapan untuk dikeringkan menjadi pupuk; limpahan cair menjadi pupuk cair.</p></li>
+      <li><span class="n">6</span><h3>AI berjaga</h3><p>Suhu, pH, tekanan, dan kebocoran dipantau. Bila tidak normal, kontroler bertindak dan asisten mengabari lewat Telegram.</p></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ================= DASBOR ================= -->
+<section class="sec sec-dash" id="dasbor">
+  <div class="wrap">
+    <div class="dash-head">
+      <div><h2>Dasbor bioreaktor</h2><p class="muted" id="modeNote">Menghubungkan ke server…</p></div>
+      <div class="dash-tools">
+        <label class="speed" id="sourceWrap" hidden>Sumber
+          <select id="source" aria-label="Sumber data"></select></label>
+        <span class="clock" id="clock">Hari 1, 08.00</span>
+        <span class="health" id="health"><i></i><span>Proses stabil</span></span>
+        <label class="speed">Kecepatan
+          <select id="speed" aria-label="Kecepatan simulasi">
+            <option value="1">1× nyata</option><option value="60">1 menit/detik</option><option value="600">10 menit/detik</option><option value="3600">1 jam/detik</option>
+          </select></label>
+        <button class="btn btn-line sm" id="pause">Jeda</button>
+      </div>
+    </div>
+
+    <div class="guest" id="guestNote" hidden><span>Anda melihat sebagai tamu. Masuk atau daftar untuk mengendalikan reaktor, bertanya ke asisten AI, dan menerima laporan.</span><button class="btn btn-merah sm" id="guestLogin">Masuk / daftar</button></div>
+    <div class="kpis" id="kpis"></div>
+
+    <div class="dash-grid">
+      <div class="viewport-card">
+        <div id="viewport" class="viewport">
+          <canvas id="c3d" aria-label="Model 3D bioreaktor dan dapur SPPG. Seret untuk memutar."></canvas>
+          <div id="labels" class="labels"></div>
+          <div class="vbar" role="toolbar" aria-label="Sudut pandang">
+            <button data-view="all" class="on">Semua</button><button data-view="reactor">Bioreaktor</button><button data-view="gas">Jalur gas</button><button data-view="kitchen">Dapur SPPG</button>
+            <span class="sep"></span><button id="xray" class="on" aria-pressed="true">Tembus pandang</button><button id="lblmode">Label: sensor</button>
+          </div>
+          <div class="hint">Seret untuk memutar, scroll atau cubit untuk zoom, klik benda untuk penjelasan</div>
+          <div id="info" class="info" role="dialog" aria-live="polite" hidden><button class="x" aria-label="Tutup penjelasan">×</button><h3></h3><p></p></div>
+          <div class="nodata" id="noData" hidden><b>Belum ada data dari perangkat ini</b><span>Nyalakan ESP32 dan pastikan kunci perangkat serta alamat server di firmware sudah benar. Angka di bawah hanya nilai awal.</span></div>
+          <div class="nogl">Browser ini tidak mendukung WebGL, jadi model 3D tidak bisa ditampilkan. Data dan kendali tetap berfungsi.</div>
+        </div>
+      </div>
+
+      <aside class="panel">
+        <div class="tabs" role="tablist">
+          <button role="tab" aria-selected="true" data-tab="kendali">Kendali</button>
+          <button role="tab" aria-selected="false" data-tab="grafik">Grafik</button>
+          <button role="tab" aria-selected="false" data-tab="sisa">Sisa</button>
+          <button role="tab" aria-selected="false" data-tab="kalk">Kalkulator</button>
+          <button role="tab" aria-selected="false" data-tab="log">Catatan</button>
+          <button role="tab" aria-selected="false" data-tab="tele">Telegram</button>
+        </div>
+        <div class="tabc">
+          <!-- KENDALI -->
+          <div class="tab on" id="tab-kendali" role="tabpanel">
+            <div class="ctl"><div><b>Mode otomatis</b><span>Kontroler mengatur suhu, buffer, dan gas surplus</span></div><button class="sw" id="swAuto" role="switch" aria-checked="true" aria-label="Mode otomatis"></button></div>
+            <div class="ctl"><div><b>Air panas ke koil</b><span>Menaikkan suhu lewat konduksi dinding selang</span></div><button class="sw hot" id="swHot" role="switch" aria-checked="false" aria-label="Air panas"></button></div>
+            <div class="ctl"><div><b>Air dingin ke koil</b><span>Menurunkan suhu saat terik</span></div><button class="sw cold" id="swCold" role="switch" aria-checked="false" aria-label="Air dingin"></button></div>
+            <div class="ctl"><div><b>Pengaduk</b><span>Mencampur umpan dengan bakteri</span></div><button class="sw" id="swStir" role="switch" aria-checked="true" aria-label="Pengaduk"></button></div>
+            <div class="ctl"><div><b>Kompor SPPG</b><span id="stoveHint">Mati</span></div><div class="row"><select id="burners" class="sel" aria-label="Jumlah tungku"><option value="1">1 tungku</option><option value="2">2 tungku</option></select><button class="btn btn-merah sm" id="btnStove">Nyalakan</button></div></div>
+            <div class="ctl"><div><b>Buffer NaHCO₃</b><span id="doseHint">–</span></div><div class="row"><input class="num sel" type="number" id="doseG" value="300" min="50" step="50" aria-label="Gram buffer"><button class="btn btn-line sm" id="btnDose">Tambah</button></div></div>
+            <div class="ctl"><div><b>Kuras endapan</b><span id="drainHint">–</span></div><div class="row"><input class="num sel" type="number" id="drainL" value="25" min="5" step="5" aria-label="Liter dikuras"><button class="btn btn-line sm" id="btnDrain">Kuras</button></div></div>
+            <h4>Masukkan sisa pangan</h4>
+            <div class="form">
+              <label>Jenis<select id="feedType" class="sel"></select></label>
+              <label>Berat (kg)<input id="feedKg" class="sel num" type="number" value="3" min=".5" step=".5"></label>
+            </div>
+            <button class="btn btn-gold full" id="btnFeed">Masukkan ke bak pencampur</button>
+            <h4>Jadwal harian</h4>
+            <label class="chk"><input type="checkbox" id="schFeed" checked> Umpan otomatis pukul 14.00 dari sisa makan siang</label>
+            <label class="chk"><input type="checkbox" id="schStove" checked> Kompor 05.00–05.40, 10.00–10.15, 17.00–17.15</label>
+            <h4>Uji gangguan <small>(mode simulasi)</small></h4>
+            <div class="scen">
+              <button data-sc="cold">Malam dingin<span>udara −10 °C, 12 jam</span></button>
+              <button data-sc="hot">Terik ekstrem<span>matahari 8 jam</span></button>
+              <button data-sc="over">Kelebihan umpan<span>30 kg sekaligus</span></button>
+              <button data-sc="protein">Umpan tinggi protein<span>10 kg lauk</span></button>
+              <button data-sc="heatfail">Pemanas rusak<span>+ malam dingin</span></button>
+              <button data-sc="leak">Selang bocor<span>metana di udara</span></button>
+              <button data-sc="stove">Gas berlebih<span>2 tungku terus</span></button>
+              <button data-sc="scrub">Scrubber jenuh<span>media 12%</span></button>
+            </div>
+            <div class="scen fix">
+              <button data-sc="fixleak">Perbaiki bocor</button><button data-sc="fixheat">Perbaiki pemanas</button><button data-sc="fixscrub">Ganti media</button><button id="btnReset" class="danger">Mulai ulang</button>
+            </div>
+          </div>
+          <!-- GRAFIK -->
+          <div class="tab" id="tab-grafik" role="tabpanel">
+            <label class="lbl-sel">Tampilkan<select id="chartSel" class="sel">
+              <option value="T">Suhu slurry (°C)</option><option value="pH">pH</option><option value="vfa">VFA (mg/L)</option><option value="P">Tekanan gas (mbar)</option>
+              <option value="Vg">Isi drum gas (%)</option><option value="prod">Produksi biogas (m³/hari)</option><option value="x">Kadar metana (%)</option><option value="sl">Endapan (L)</option></select></label>
+            <div class="chart"><canvas id="bigChart" height="220"></canvas><div class="tip" id="chartTip" hidden></div></div>
+            <p class="muted small">Area hijau = rentang normal. Arahkan kursor ke grafik untuk melihat nilai.</p>
+            <h4>Tahap pencernaan anaerob</h4>
+            <div id="stages"></div>
+            <h4>Hasil sejak mulai</h4>
+            <table class="kv" id="summary"></table>
+          </div>
+          <!-- SISA PANGAN -->
+          <div class="tab" id="tab-sisa" role="tabpanel">
+            <h4 class="first">Sisa makan siang hari ini</h4>
+            <div id="cvToday" class="muted">Rekap smart bin dibuat pukul 13.00 waktu simulasi.</div>
+            <h4>Menu dengan persentase sisa tertinggi</h4>
+            <div id="cvRank" class="muted">Belum ada data.</div>
+            <div id="cvReco"></div>
+            <h4>Prediksi proses</h4>
+            <table class="kv" id="aiTable"></table>
+            <div id="aiNotes"></div>
+            <p class="muted small">Data smart bin di mode simulasi dibangkitkan acak. Pada alat nyata, kamera dan model computer vision mengisinya.</p>
+          </div>
+          <!-- KALKULATOR -->
+          <div class="tab" id="tab-kalk" role="tabpanel">
+            <h4 class="first">Berapa besar bioreaktor untuk SPPG Anda?</h4>
+            <div class="form">
+              <label>Porsi per hari<input id="kPorsi" class="sel num" type="number" value="2500" step="100"></label>
+              <label>Sisa per porsi (g)<input id="kGram" class="sel num" type="number" value="48" step="1"></label>
+              <label>Masuk digester (%)<input id="kIn" class="sel num" type="number" value="100" step="5"></label>
+              <label>Harga LPG 12 kg (Rp)<input id="kLpg" class="sel num" type="number" value="218000" step="1000"></label>
+            </div>
+            <table class="kv" id="kOut"></table>
+            <p class="muted small">Asumsi: VS 21,7% berat basah (Zhang dkk. 2014), 0,355 m³ CH₄/kg VS (Forster-Carneiro dkk. 2008), OLR 2 kg VS/m³·hari (Almomani &amp; Bhosale 2020), HRT 40 hari (Mapantsela dkk. 2024), air 1:1, 313 hari/tahun. 48 g/porsi dari studi UGM 2025; kajian Bappenas menyiratkan 42–54 g. Perkiraan awal, bukan pengganti uji BMP.</p>
+          </div>
+          <!-- LOG -->
+          <div class="tab" id="tab-log" role="tabpanel">
+            <div class="log" id="log"></div>
+          </div>
+          <!-- TELEGRAM -->
+          <div class="tab" id="tab-tele" role="tabpanel">
+            <div id="teleStatus" class="tele-card"></div>
+            <h4>Yang bisa dilakukan bot</h4>
+            <ul class="plain">
+              <li>Menjawab pertanyaan biasa dengan Gemini dan mengingat obrolan sebelumnya</li>
+              <li>Mengirim peringatan saat suhu, pH, tekanan, atau kebocoran tidak normal</li>
+              <li>Menjalankan perintah: <code>/status</code>, <code>/kompor_on</code>, <code>/buffer 300</code>, <code>/kuras 20</code></li>
+              <li>Menunjukkan apa yang diingat: <code>/ingatan</code>; menghapus: <code>/lupa</code></li>
+            </ul>
+            <h4>Cara bergabung</h4>
+            <ol class="plain">
+              <li>Buka bot di Telegram lalu tekan <b>Start</b>.</li>
+              <li>Bot membalas "menunggu persetujuan admin".</li>
+              <li>Setelah admin menyetujui di panel admin, ketik <code>/start</code> lagi.</li>
+            </ol>
+            <div id="teleAdmin" hidden><a class="btn btn-line sm" href="admin.html#telegram">Kelola chat Telegram di panel admin →</a></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DATA ================= -->
+<section class="sec" id="data">
+  <div class="wrap">
+    <div class="sec-head"><h2>Angka yang bisa ditelusuri</h2><p>Setiap angka di bawah punya sumber. Seluruh 151 data dan 51 sumber ada di file Excel penelitian.</p></div>
+    <div class="evid">
+      <article><h3>Sisa di piring sekolah</h3><p class="big">±48 g</p><p>sisa makan siang per siswa SD per hari (2.484 g untuk 52 siswa, Yogyakarta). Kesukaan menu karbohidrat dan lauk berpengaruh; pengetahuan tidak.</p><cite>Muthmainnah dkk., Jurnal Gizi Klinik Indonesia, 2025</cite></article>
+      <article><h3>Ukuran SPPG</h3><p class="big">2.500</p><p>penerima rata-rata per SPPG baru (maks 3.000), anggaran Rp15.000 per penerima per hari, 313 hari operasional.</p><cite>Badan Gizi Nasional, Juknis TA 2026</cite></article>
+      <article><h3>Suhu yang dijaga</h3><p class="big">±3 °C</p><p>variasi maksimal di sekitar 35 °C. Dari 25 ke 37 °C produksi biogas naik ±3 kali; goyah 5 °C bisa menghentikannya.</p><cite>Mapantsela dkk., Gases 2024; Garkoti dkk., RSER 2024</cite></article>
+      <article><h3>Buffer yang tepat</h3><p class="big">1,0 g/g VS</p><p>dosis NaHCO₃ yang menaikkan metana 11,2–29,7%. Dosis 1,25 g/g VS ke atas justru menurunkan hasil.</p><cite>Almomani &amp; Bhosale, Chemosphere 2020</cite></article>
+      <article><h3>Satu SPPG penuh</h3><p class="big">±13 m³</p><p>volume digester untuk sisa ±120 kg/hari dari 2.500 porsi, setara ±7 kg LPG per hari. Modul 500 L cocok untuk percontohan.</p><cite>Perhitungan model, lihat sheet Perhitungan</cite></article>
+      <article><h3>Pupuk yang aman</h3><p class="big">Wajib kering</p><p>digesti mesofilik menurunkan patogen tetapi tidak menghilangkannya. Endapan dikeringkan atau dikomposkan sebelum dipakai.</p><cite>Machnicka &amp; Grübel, ESPR 2023</cite></article>
+    </div>
+    <div class="dl"><a class="btn btn-merah" href="docs/Data_Penelitian_MBG_BIOLOOP.xlsx" download>Unduh data penelitian (Excel)</a><button class="btn btn-line" data-doc="ARSITEKTUR.md">Lihat arsitektur sistem</button></div>
+  </div>
+</section>
+
+<!-- ================= PANDUAN ================= -->
+<section class="sec sec-guide" id="panduan">
+  <div class="wrap">
+    <div class="sec-head"><h2>Online dalam empat langkah</h2><p>Tidak perlu jago pemrograman. Panduan lengkap menjelaskan setiap klik, dari GitHub sampai Telegram.</p></div>
+    <ol class="guide">
+      <li><b>Unggah ke GitHub</b><p>Buat repositori, unggah isi folder proyek lewat tombol <i>Add file → Upload files</i>.</p></li>
+      <li><b>Buat database Supabase</b><p>Proyek baru gratis, salin <i>connection string</i> mode <i>Transaction pooler</i>.</p></li>
+      <li><b>Impor ke Vercel</b><p>Pilih repositori GitHub, isi <code>DATABASE_URL</code>, token Telegram, dan key Gemini, lalu <i>Deploy</i>.</p></li>
+      <li><b>Masuk sebagai admin</b><p>Buka <code>/admin.html</code>, pasang webhook Telegram, daftarkan perangkat, ganti kata sandi.</p></li>
+    </ol>
+    <div class="dl"><button class="btn btn-gold" data-doc="PANDUAN_DEPLOY_VERCEL.md">Panduan deploy (GitHub + Vercel)</button><button class="btn btn-line" data-doc="PANDUAN_PENGGUNAAN.md">Panduan pengguna &amp; admin</button><button class="btn btn-line" data-doc="PANDUAN_SETUP.md">Menjalankan di komputer sendiri</button><button class="btn btn-line" data-doc="PANDUAN_TERMINAL.md">Perintah terminal (tanpa .bat)</button></div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <div><img src="img/logo.svg" alt="" width="40" height="40"><p><b>MBG-BIOLOOP AI</b><br>Dari sisa pangan menjadi energi, pupuk, dan data untuk generasi emas.</p></div>
+    <p class="muted-inv">Model edukasi. Angka proses dihitung dari literatur, bukan hasil kalibrasi alat. Keselamatan gas: letakkan reaktor di luar ruangan, pasang pengaman nyala dan scrubber H₂S.</p>
+  </div>
+</footer>
+
+<!-- ================= CHAT ================= -->
+<button class="fab" data-open-chat aria-label="Buka asisten AI"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.2 3.6c-.6.5-1.3.1-1.3-.6V16A2.5 2.5 0 0 1 4 13.5z" fill="currentColor"/><circle cx="9" cy="9.6" r="1.2" fill="#7A1020"/><circle cx="12" cy="9.6" r="1.2" fill="#7A1020"/><circle cx="15" cy="9.6" r="1.2" fill="#7A1020"/></svg><span>Asisten AI</span></button>
+<aside class="chat" id="chat" aria-label="Asisten BIOLOOP" hidden>
+  <header class="chat-h">
+    <img src="img/logo.svg" alt="" width="36" height="36">
+    <div><b>Asisten BIOLOOP</b><small id="chatSub">Didukung Gemini, mengingat percakapan Anda</small></div>
+    <button class="icon" id="chatMenu" aria-label="Pilihan asisten" aria-expanded="false">⋯</button>
+    <button class="icon" id="chatClose" aria-label="Tutup asisten">×</button>
+    <div class="chat-menu" id="chatMenuBox" hidden>
+      <button id="chatMemory">Lihat yang diingat</button>
+      <button id="chatForget" class="danger">Lupakan percakapan ini</button>
+    </div>
+  </header>
+  <div class="chat-body" id="chatBody" aria-live="polite"></div>
+  <div class="chips" id="chips">
+    <button>Bagaimana kondisi reaktor sekarang?</button><button>Kenapa pH bisa turun?</button><button>Berapa LPG yang sudah dihemat?</button><button>Menu apa yang paling banyak tersisa?</button>
+  </div>
+  <form class="chat-f" id="chatForm"><textarea id="chatIn" rows="1" placeholder="Tulis pertanyaan…" aria-label="Pesan untuk asisten"></textarea><button class="send" aria-label="Kirim"><svg viewBox="0 0 24 24"><path d="M3.4 20.4 21 12 3.4 3.6l.1 6.5L15 12 3.5 13.9z" fill="currentColor"/></svg></button></form>
+</aside>
+
+<div class="modal" id="modal" hidden><div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><button class="x" id="modalClose" aria-label="Tutup">×</button><h2 id="modalTitle"></h2><div id="modalBody" class="md"></div></div></div>
+<div id="toasts" class="toasts" aria-live="polite"></div>
+
+<script src="vendor/three.min.js"></script>
+<script src="js/sim.js"></script>
+<script>window.S = SIM.getS();</script>
+<script src="js/scene.js"></script>
+<script src="js/md.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/app.js"></script>
+<script src="js/chat.js"></script>
+</body>
+</html>

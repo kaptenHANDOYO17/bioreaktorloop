@@ -1,0 +1,14 @@
+services:
+  bioloop:
+    build: .
+    container_name: mbg-bioloop
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - DATA_DIR=/app/data
+    ports:
+      - "3000:3000"
+    volumes:
+      - bioloop-data:/app/data
+volumes:
+  bioloop-data:
