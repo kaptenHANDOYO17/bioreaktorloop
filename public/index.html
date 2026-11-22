@@ -21,7 +21,7 @@
       <span><b>MBG-BIOLOOP</b><small id="siteName">Bioreaktor SPPG</small></span>
     </a>
     <nav class="links" aria-label="Navigasi utama">
-      <a href="#cara-kerja">Cara kerja</a><a href="#dasbor">Pantau</a><a href="#data">Data &amp; bukti</a><a href="#panduan">Bantuan</a>
+      <a href="#cara-kerja">Cara kerja</a><a href="#dasbor">Pantau</a><a href="#simulasi">Simulasi</a><a href="#data">Data &amp; bukti</a><a href="#panduan">Bantuan</a>
     </nav>
     <div class="nav-right">
       <span class="conn" id="conn" title="Status koneksi server"><i></i><span>Menghubungkan…</span></span>
@@ -190,12 +190,12 @@
             <h4 class="first">Berapa besar bioreaktor untuk SPPG Anda?</h4>
             <div class="form">
               <label>Porsi per hari<input id="kPorsi" class="sel num" type="number" value="2500" step="100"></label>
-              <label>Sisa per porsi (g)<input id="kGram" class="sel num" type="number" value="48" step="1"></label>
+              <label>Sisa per porsi (g)<input id="kGram" class="sel num" type="number" value="47.8" step="0.1"></label>
               <label>Masuk digester (%)<input id="kIn" class="sel num" type="number" value="100" step="5"></label>
               <label>Harga LPG 12 kg (Rp)<input id="kLpg" class="sel num" type="number" value="218000" step="1000"></label>
             </div>
             <table class="kv" id="kOut"></table>
-            <p class="muted small">Asumsi: VS 21,7% berat basah (Zhang dkk. 2014), 0,355 m³ CH₄/kg VS (Forster-Carneiro dkk. 2008), OLR 2 kg VS/m³·hari (Almomani &amp; Bhosale 2020), HRT 40 hari (Mapantsela dkk. 2024), air 1:1, 313 hari/tahun. 48 g/porsi dari studi UGM 2025; kajian Bappenas menyiratkan 42–54 g. Perkiraan awal, bukan pengganti uji BMP.</p>
+            <p class="muted small">Volume diambil yang terbesar dari dua kriteria: beban organik OLR 2,0 kg VS/m³·hari (Almomani &amp; Bhosale 2020) dan waktu tinggal minimum 30 hari dengan umpan diencerkan ke TS 8% (Mapantsela dkk. 2024). VS 21,7% dan TS 24,5% berat basah (Zhang dkk. 2014), 0,355 m³ CH₄/kg VS (Forster-Carneiro dkk. 2008), kebutuhan LPG 18,7 kg/hari per 3.120 porsi (Dermawan &amp; Fauzi 2026), 313 hari/tahun. Biaya memakai harga marketplace 18 Nov 2026 + instalasi 15% + cadangan 10%. Perkiraan model, bukan pengganti uji BMP dan penawaran harga resmi.</p>
           </div>
           <!-- LOG -->
           <div class="tab" id="tab-log" role="tabpanel">
@@ -225,6 +225,54 @@
   </div>
 </section>
 
+<!-- ================= SIMULASI BOTOL ================= -->
+<section class="sec sec-demo" id="simulasi" aria-labelledby="demoTitle">
+  <div class="wrap">
+    <div class="demo-head">
+      <div class="demo-intro">
+        <p class="demo-kicker">Simulasi analogi untuk presentasi</p>
+        <h2 id="demoTitle">Botol yang tidak diawasi vs bioreaktor BIO-LOOP</h2>
+        <p>Sisa makanan di dalam botol terus menghasilkan gas. Tanpa ada yang melihat, tekanan naik sampai botol pecah. Dengan BIO-LOOP, sensor mengirim peringatan dan katup otomatis mengalirkan gas ke kompor.</p>
+      </div>
+      <div class="demo-ctl" role="group" aria-label="Kendali simulasi">
+        <button class="btn btn-gold" id="demoStart">▶ Mulai simulasi</button>
+        <button class="btn btn-ghost" id="demoReset">Ulangi</button>
+        <label class="demo-sel">Durasi <select id="demoSpeed"><option value="22">Lambat ±22 detik</option><option value="14" selected>Normal ±14 detik</option><option value="8">Cepat ±8 detik</option></select></label>
+        <label class="demo-chk"><input type="checkbox" id="demoSound" checked> Suara</label>
+        <label class="demo-chk" id="demoTgWrap" title="Kirim peringatan contoh ke chat Telegram yang disetujui (perlu masuk akun)"><input type="checkbox" id="demoTg"> Kirim ke Telegram</label>
+        <button class="btn btn-ghost" id="demoFull">⛶ Layar penuh</button>
+      </div>
+    </div>
+    <div class="demo-stage" id="demoStage">
+      <article class="demo-panel" id="dpA" aria-live="polite"></article>
+      <article class="demo-panel" id="dpB" aria-live="polite"></article>
+      <div class="demo-summary" id="demoSummary" hidden></div>
+    </div>
+    <div class="demo-notes">
+      <div>
+        <h3>Analogi di atas meja juri</h3>
+        <table class="demo-map">
+          <tr><th>Peraga</th><th>Di bioreaktor</th></tr>
+          <tr><td>Botol</td><td>Tangki digester</td></tr>
+          <tr><td>Baking soda + cuka</td><td>Bakteri mencerna sisa makanan dan menghasilkan gas</td></tr>
+          <tr><td>Balon di leher botol</td><td>Penampung gas (drum/kantong)</td></tr>
+          <tr><td>Jarum, balon meletus</td><td>Tidak ada yang mengawasi saat tekanan naik</td></tr>
+          <tr><td>Layar ini + HP berbunyi</td><td>Sensor tekanan, peringatan Telegram, katup ke kompor</td></tr>
+        </table>
+      </div>
+      <div>
+        <h3>Cara memakai saat presentasi</h3>
+        <ol>
+          <li>Buka <b>alamat website + /simulasi</b>, tekan <b>Layar penuh</b>.</li>
+          <li>Masuk akun dan centang <b>Kirim ke Telegram</b> bila ingin HP juri/petugas ikut berbunyi.</li>
+          <li>Tekan <b>Mulai</b> tepat setelah balon peraga meletus, lalu jelaskan sisi kanan.</li>
+        </ol>
+        <p class="demo-honest">Ini analogi. Digester floating drum bertekanan rendah dan punya katup pengaman; bahaya nyatanya adalah gas yang menumpuk, bocor, lalu bertemu api (metana mudah terbakar mulai 5% di udara). Jangan meniru dengan botol yang ditutup rapat sungguhan.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ================= DATA ================= -->
 <section class="sec" id="data">
   <div class="wrap">
@@ -234,7 +282,9 @@
       <article><h3>Ukuran SPPG</h3><p class="big">2.500</p><p>penerima rata-rata per SPPG baru (maks 3.000), anggaran Rp15.000 per penerima per hari, 313 hari operasional.</p><cite>Badan Gizi Nasional, Juknis TA 2026</cite></article>
       <article><h3>Suhu yang dijaga</h3><p class="big">±3 °C</p><p>variasi maksimal di sekitar 35 °C. Dari 25 ke 37 °C produksi biogas naik ±3 kali; goyah 5 °C bisa menghentikannya.</p><cite>Mapantsela dkk., Gases 2024; Garkoti dkk., RSER 2024</cite></article>
       <article><h3>Buffer yang tepat</h3><p class="big">1,0 g/g VS</p><p>dosis NaHCO₃ yang menaikkan metana 11,2–29,7%. Dosis 1,25 g/g VS ke atas justru menurunkan hasil.</p><cite>Almomani &amp; Bhosale, Chemosphere 2020</cite></article>
-      <article><h3>Satu SPPG penuh</h3><p class="big">±13 m³</p><p>volume digester untuk sisa ±120 kg/hari dari 2.500 porsi, setara ±7 kg LPG per hari. Modul 500 L cocok untuk percontohan.</p><cite>Perhitungan model, lihat sheet Perhitungan</cite></article>
+      <article><h3>Satu SPPG penuh</h3><p class="big">±13 m³</p><p>volume kerja untuk sisa ±120 kg/hari dari 2.500 porsi: 3 tangki 5 m³, setara ±7 kg LPG per hari (±47% kebutuhan dapur). Prototipe 500 L adalah skala uji 1:30, setara sisa ±87 porsi.</p><cite>Model tim: OLR 2,0 (Almomani &amp; Bhosale 2020) dan HRT 30 hari (Mapantsela dkk. 2024)</cite></article>
+      <article><h3>Investasi satu SPPG</h3><p class="big">±Rp126 jt</p><p>rentang Rp84–189 juta termasuk instalasi dan cadangan. Hemat LPG ±Rp39,9 juta/tahun, operasional ±Rp12,1 juta: balik modal ±4,5 tahun. Setara ±21 hari insentif fasilitas SPPG.</p><cite>Harga marketplace 18 Nov 2026; LPG 12 kg Rp218.000 (CNBC Indonesia 2026)</cite></article>
+      <article><h3>Belum diukur di lapangan</h3><p class="big">Langkah 1: BMP</p><p>semua angka di halaman ini hasil pemodelan dan harga pasar. Uji potensi metana sisa MBG asli, lalu pilot di satu SPPG mitra, adalah langkah berikutnya.</p><cite>Catatan kejujuran tim BIO-LOOP</cite></article>
       <article><h3>Pupuk yang aman</h3><p class="big">Wajib kering</p><p>digesti mesofilik menurunkan patogen tetapi tidak menghilangkannya. Endapan dikeringkan atau dikomposkan sebelum dipakai.</p><cite>Machnicka &amp; Grübel, ESPR 2023</cite></article>
     </div>
     <div class="dl"><a class="btn btn-merah" href="docs/Data_Penelitian_MBG_BIOLOOP.xlsx" download>Unduh data penelitian (Excel)</a><button class="btn btn-line" data-doc="PANDUAN_PENGGUNA.md">Cara membaca angka di dasbor</button></div>
@@ -288,6 +338,7 @@
 
 <script src="vendor/three.min.js"></script>
 <script src="js/sim.js"></script>
+<script src="js/sizing.js"></script>
 <script>window.S = SIM.getS();</script>
 <script src="js/scene.js"></script>
 <script src="js/md.js"></script>
@@ -295,5 +346,6 @@
 <script src="js/auth.js"></script>
 <script src="js/app.js"></script>
 <script src="js/chat.js"></script>
+<script src="js/demo.js"></script>
 </body>
 </html>
