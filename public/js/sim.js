@@ -155,6 +155,8 @@ function step(dt) {
     if (S.T < lo && !S.hot) setHot(true, 'auto'); else if (S.hot && S.T >= S.set.T + .3) setHot(false, 'auto');
     if (S.T > hi && !S.cold) setCold(true, 'auto'); else if (S.cold && S.T <= S.set.T - .3) setCold(false, 'auto');
     if (S.pH < S.set.pHmin && t - S.lastDose > 4 && S.doseG <= 0) dose(autoDoseG(), 'auto');
+    /* endapan melewati batas: kuras otomatis s.d. 60 L, paling sering tiap 12 jam */
+    if (S.sludgeL > S.set.sludgeMax && !(S.drainL > 0) && t - (S.lastAutoDrain == null ? -1e9 : S.lastAutoDrain) > 12) { S.lastAutoDrain = t; drain(Math.min(60, S.sludgeL - S.set.sludgeMax * .6), 'auto'); }
     if (!S.boiler && !S.stove && S.Vg > .93 * R.VgMax) { S.boiler = true; emit('boiler', { on: true }); }
     else if (S.boiler && (S.Vg < .82 * R.VgMax || S.stove)) { S.boiler = false; emit('boiler', { on: false }); }
   } else if (S.boiler) { S.boiler = false; emit('boiler', { on: false }); }

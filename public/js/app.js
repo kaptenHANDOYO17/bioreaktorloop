@@ -543,14 +543,20 @@ function renderSisa() {
 }
 function renderKalk() {
   const porsi = SIM.clamp(+$('#kPorsi').value || 0, 0, 50000), g = SIM.clamp(+$('#kGram').value || 0, 0, 1000), pin = SIM.clamp(+$('#kIn').value || 0, 0, 100) / 100, price = +$('#kLpg').value || 0;
-  const kg = porsi * g / 1000 * pin, vs = kg * .217, ch4 = vs * .355, lpg = ch4 * .7156 * 50.4 / 47.3;
-  const vol = Math.max(vs / 2, kg * 2 / 1000 * 40), days = 313;
-  $('#kOut').innerHTML = [
-    ['Sisa pangan masuk digester', `${nf(kg, 1)} kg/hari`], ['Padatan organik (VS)', `${nf(vs, 1)} kg/hari`], ['Metana', `${nf(ch4, 1)} m³/hari`],
-    ['Setara LPG', `${nf(lpg, 1)} kg/hari`], ['Volume kerja digester', `${nf(vol, 1)} m³`], ['Jumlah modul 500 L', nf(Math.ceil(vol / .5))],
-    ['LPG 12 kg dihemat per tahun', `${nf(lpg * days / 12)} tabung`], ['Perkiraan hemat per tahun', rp(lpg * days * price / 12)],
-    ['Sisa pangan tidak ke TPA per tahun', `${nf(kg * days / 1000, 1)} ton`]
-  ].map((r, i) => `<tr${i === 7 ? ' class="hl"' : ''}><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('');
+  if (!porsi || !g || !pin) { $('#kOut').innerHTML = '<tr><td colspan="2">Isi porsi, sisa per porsi, dan persen masuk.</td></tr>'; return; }
+  const o = SIZING.compute({ porsi, gram: g, masuk: pin, harga: price });
+  const jt = v => 'Rp' + nf(v / 1e6, 1) + ' jt';
+  const rows = [
+    ['Sisa pangan masuk digester', `${nf(o.fw, 1)} kg/hari`], ['Padatan organik (VS)', `${nf(o.vsd, 1)} kg/hari`],
+    ['Volume menurut beban organik (OLR 2,0)', `${nf(o.vOlr, 1)} m³`], ['Volume menurut waktu tinggal (30 hari)', `${nf(o.vHrt, 1)} m³`],
+    ['Volume kerja dibutuhkan', `<b>${nf(o.vw, 1)} m³</b> · penentu ${o.gov}`, 'hl'], ['Konfigurasi', `${o.ntank} tangki 5 m³ · HRT ${nf(o.hrtInst)} hari`],
+    ['Biogas', `${nf(o.bg, 1)} m³/hari (${nf(o.lpg, 1)} kg LPG)`], ['Menutup kebutuhan LPG dapur', `±${nf(o.cover * 100)}%`],
+    ['Simpan gas di luar jam masak', `${nf(o.store, 1)} m³ · ${o.nbag} kantong 2 m³`], ['Panas pemeliharaan 35 °C', `±${nf(o.heatShare * 100)}% energi biogas`],
+    ['Perkiraan investasi', `${jt(o.capex)} (${jt(o.capexLow)}–${jt(o.capexHigh)})`, 'hl'], ['Hemat LPG per tahun', `${jt(o.saving)} · ${nf(o.tabung)} tabung 12 kg`],
+    ['Biaya operasional per tahun', jt(o.opex)], ['Balik modal', isFinite(o.payback) ? `±${nf(o.payback, 1)} tahun` : 'tidak tercapai', 'hl'],
+    ['CO₂ LPG tergantikan', `${nf(o.co2, 1)} t/tahun`], ['Prototipe 500 L setara', `±${nf(o.protoPorsi)} porsi · skala 1:${nf(o.scale)}`]
+  ];
+  $('#kOut').innerHTML = rows.map(r => `<tr${r[2] ? ' class="hl"' : ''}><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('');
 }
 ['#kPorsi', '#kGram', '#kIn', '#kLpg'].forEach(id => $(id).addEventListener('input', () => { renderKalk(); if (activeTab() === 'grafik') renderGrafik(); }));
 
