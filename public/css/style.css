@@ -72,6 +72,9 @@ code { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; 
 .links { display: flex; gap: 4px; margin-left: 12px; }
 .links a { color: rgba(255,255,255,.82); text-decoration: none; font-weight: 600; font-size: .9rem; padding: 8px 12px; border-radius: 999px; }
 .links a:hover, .links a.on { color: #fff; background: rgba(255,255,255,.1); }
+.links a.nav-sim { color: var(--emas-terang); box-shadow: inset 0 0 0 1px rgba(243,210,122,.45); }
+.links a.nav-sim span { font-size: .72em; margin-right: 2px; }
+.nav-sim-btn { display: none; }
 .nav-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
 .conn { display: inline-flex; align-items: center; gap: 8px; font-size: .78rem; font-weight: 600; color: rgba(255,255,255,.85); background: rgba(255,255,255,.08); padding: 6px 12px; border-radius: 999px; }
 .conn i { width: 8px; height: 8px; border-radius: 50%; background: var(--abu-2); }
@@ -398,6 +401,7 @@ ul.plain li { margin: 4px 0; }
   .hero-grid { grid-template-columns: 1fr; }
   .loop { max-width: 420px; }
   .links { display: none; }
+  .nav-right > .nav-sim-btn { display: inline-flex; }
   .steps, .evid { grid-template-columns: repeat(2, 1fr); }
   .guide { grid-template-columns: repeat(2, 1fr); }
   .guide li:nth-child(2)::after { display: none; }
@@ -413,7 +417,9 @@ ul.plain li { margin: 4px 0; }
   .facts cite { grid-column: 1 / -1; }
   .conn span { display: none; }
   .conn { padding: 8px; }
-  .nav-right > .btn { display: none; }
+  .nav-right > .btn:not(.nav-sim-btn) { display: none; }
+  .nav-sim-btn { padding: 7px 10px; font-size: .8rem; }
+  .brand b { white-space: nowrap; }
   .brand small { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .loop-nodes li { width: 84px; font-size: .68rem; }
   .loop-nodes .ic { width: 44px; height: 44px; }
@@ -613,3 +619,7 @@ ol.plain { margin: 0 0 12px; padding-left: 20px; font-size: .88rem; color: var(-
   .demo-map td:first-child { white-space: normal; }
 }
 @media (prefers-reduced-motion: reduce) { .demo-stage.shake, .demo-svg .boom.pop { animation: none; } .demo-svg .boom.pop { opacity: 1; } }
+@media (max-width: 430px) {
+  .nav-right > .conn { display: none; }
+  .brand small { max-width: 110px; }
+}
