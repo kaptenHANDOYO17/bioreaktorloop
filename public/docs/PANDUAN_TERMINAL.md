@@ -123,7 +123,7 @@ Start-Process http://localhost:3000
 Start-Process http://localhost:3000/admin.html
 ```
 
-Masuk panel admin dengan `Handoyo` / `12345`, lalu **segera ganti kata sandinya**.
+Masuk panel admin dengan `Handoyo` / kata sandi dari `ADMIN_PASSWORD`, lalu **segera ganti kata sandinya**.
 
 Catatan:
 
@@ -266,7 +266,7 @@ Remove-Item .\data\*.json
 npm start
 ```
 
-Akun admin `Handoyo` / `12345` dibuat lagi otomatis. (Data di Supabase **tidak** terhapus oleh perintah ini.)
+Akun admin `Handoyo` dibuat lagi otomatis dengan kata sandi dari `ADMIN_PASSWORD`. (Data di Supabase **tidak** terhapus oleh perintah ini.)
 
 ### 2.5 Akun dan lupa kata sandi (`npm run akun`)
 
@@ -275,7 +275,7 @@ Bekerja pada database di `DATABASE_URL` file `.env`. Bila sama dengan di Vercel,
 ```
 npm run akun -- daftar
 npm run akun -- awal
-npm run akun -- sandi Handoyo 12345
+npm run akun -- sandi Handoyo SandiBaruAnda
 npm run akun -- buat rina rina2045 user "Rina Ahli Gizi"
 npm run akun -- admin rina
 npm run akun -- user rina
@@ -287,7 +287,7 @@ npm run akun -- hapus rina
 | Perintah | Fungsi |
 |---|---|
 | `daftar` | Lihat semua akun (kata sandi tidak bisa ditampilkan) |
-| `awal` | Buat/pulihkan akun mudah: `Handoyo/12345`, `admin/admin123` (admin), `petugas/petugas123`, `gizi/gizi123`, `guru/guru123` (pengguna) |
+| `awal` | Buat/pulihkan akun mudah: akun `Handoyo`, `admin` (admin), `petugas`, `gizi`, `guru` (pengguna) dengan kata sandi acak yang dicetak di terminal |
 | `sandi <nama> <sandi>` | Ganti kata sandi dan buka kunci akun |
 | `buat <nama> <sandi> [admin\|user] "Nama"` | Tambah akun |
 | `admin` / `user <nama>` | Ubah peran |
@@ -328,7 +328,7 @@ Atau pakai port lain: tambahkan `PORT=3001` di `.env`, lalu buka `http://localho
 | Panggil cron Vercel | `curl https://<alamat-anda>.vercel.app/api/cron` |
 | Hapus data lokal | `rm data/*.json` |
 | Reset admin | `ADMIN_RESET_PASSWORD='<sandi sementara>' npm start` |
-| Akun mudah / lupa sandi | `npm run akun -- awal` · `npm run akun -- sandi Handoyo 12345` |
+| Akun mudah / lupa sandi | `npm run akun -- awal` · `npm run akun -- sandi Handoyo SandiBaruAnda` |
 | Bot Telegram | `npm run bot -- info` · `npm run bot -- chat` · `npm run bot -- setujui <chat id>` |
 | Profil bot | `npm run bot -- profil` |
 | Riwayat 30 hari | `npm run data -- isi` · `npm run data -- hapus` |

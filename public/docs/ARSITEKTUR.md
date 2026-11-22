@@ -68,7 +68,7 @@ Tiga kolam massa: partikulat → terlarut → asam lemak volatil (VFA) → metan
 - Sesi: token `uid.pv.exp` bertanda tangan HMAC-SHA256 dalam cookie `bl_sess` (HttpOnly, SameSite=Lax, Secure di HTTPS), berlaku 7 hari. `pw_version` naik saat sandi diganti/direset atau akun dinonaktifkan, sehingga sesi lama langsung gugur.
 - 5 kali salah → akun dikunci 10 menit. Nama pengguna tidak dibedakan huruf besar/kecil.
 - Permintaan POST dari browser ditolak bila header `Origin` berbeda domain (perlindungan CSRF).
-- Admin pertama (`ADMIN_USERNAME`/`ADMIN_PASSWORD`, bawaan `Handoyo`/`12345`) dibuat hanya bila belum ada admin aktif, dengan tanda `must_change`. Pemulihan darurat: `ADMIN_RESET_PASSWORD`.
+- Admin pertama (`ADMIN_USERNAME`/`ADMIN_PASSWORD`, bawaan nama `Handoyo`, sandi acak bila `ADMIN_PASSWORD` kosong) dibuat hanya bila belum ada admin aktif, dengan tanda `must_change`. Pemulihan darurat: `ADMIN_RESET_PASSWORD`.
 - Kunci perangkat: `blk_` + 24 byte acak; yang disimpan hanya SHA-256-nya dan 4 karakter terakhir.
 
 ## Desain ingatan asisten
@@ -198,7 +198,7 @@ Kontrol lokal tanpa server: histeresis suhu, katup kompor ditutup saat LEL > 10%
 - **Keluaran AI** dirender dengan markdown mini yang meng-escape HTML; tautan hanya `http(s)`/relatif.
 - **Header keamanan** (`nosniff`, `Referrer-Policy`, `X-Frame-Options`) lewat `vercel.json`.
 - **Data tingkat gratis Gemini** dapat dipakai Google untuk pengembangan produk. Hindari data pribadi siswa.
-- **Kata sandi bawaan** `12345` hanya untuk masuk pertama; panel admin menampilkan spanduk sampai diganti.
+- **Kata sandi awal** hanya untuk masuk pertama; panel admin menampilkan spanduk sampai diganti.
 
 ## Mengembangkan lebih lanjut
 

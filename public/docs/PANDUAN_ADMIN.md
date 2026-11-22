@@ -20,17 +20,17 @@ Di halaman dasbor, admin juga melihat alat khusus admin: **kecepatan simulasi, j
 
 ### Akun siap pakai
 
-Setelah menjalankan `npm run akun -- awal` (lihat *Menyelesaikan pemasangan*), akun berikut aktif:
+Setelah menjalankan `npm run akun -- awal` (lihat *Menyelesaikan pemasangan*), akun berikut aktif. Kata sandinya **acak** dan hanya dicetak sekali di terminal:
 
-| Nama pengguna | Kata sandi | Peran |
-|---|---|---|
-| `Handoyo` | `12345` | admin |
-| `admin` | `admin123` | admin |
-| `petugas` | `petugas123` | pengguna |
-| `gizi` | `gizi123` | pengguna |
-| `guru` | `guru123` | pengguna |
+| Nama pengguna | Peran |
+|---|---|
+| `Handoyo` | admin |
+| `admin` | admin |
+| `petugas` | pengguna |
+| `gizi` | pengguna |
+| `guru` | pengguna |
 
-> **Kata sandi ini mudah ditebak.** Pakai sementara saja. Sebelum website dibagikan, ganti kata sandi admin (klik nama Anda → *Ganti kata sandi*) dan nonaktifkan akun yang tidak dipakai di menu **Pengguna**.
+> Repositori dan folder `docs` website ini publik, jadi kata sandi tidak pernah ditulis di sini. Sebelum website dibagikan, ganti kata sandi admin (klik nama Anda → *Ganti kata sandi*) dan nonaktifkan akun yang tidak dipakai di menu **Pengguna**.
 
 ### Mengelola akun lewat panel
 
@@ -45,7 +45,7 @@ Pakai terminal VS Code di folder proyek (file `.env` harus berisi `DATABASE_URL`
 
 ```
 npm run akun -- daftar
-npm run akun -- sandi Handoyo 12345
+npm run akun -- sandi Handoyo SandiBaruAnda
 ```
 
 Baris pertama menampilkan semua akun; baris kedua mengganti kata sandi dan membuka kunci akun. Perintah lain:
@@ -175,3 +175,20 @@ Menu **Pengaturan → Data riwayat → Isi riwayat 30 hari** mengisi 30 hari ter
 - Setujui hanya chat Telegram dan akun yang Anda kenal. Nonaktifkan akun petugas yang pindah tugas.
 - Unduh laporan Excel tiap bulan sebagai arsip.
 - Jangan membagikan isi Environment Variables Vercel atau file `.env` (token bot, kunci Gemini, `DATABASE_URL`).
+
+## Menyetujui pendaftaran (versi 3.3)
+
+1. Seseorang mendaftar di website (**Masuk / daftar → Daftar akun baru**). Akunnya berstatus *Menunggu persetujuan*.
+2. Bot Telegram mengirim pesan **📝 Pendaftaran akun baru** ke semua chat yang sudah disetujui.
+3. Buka **alamat-website/admin** → menu **Pengguna** (ada angka merah) → klik **Setujui** atau **Tolak**.
+4. Orang itu sekarang bisa masuk dengan nama pengguna dan kata sandi yang ia buat sendiri.
+
+Chat Telegram baru disetujui di menu **Telegram & notifikasi** (chat muncul setelah orang menekan *Start* di bot).
+
+## Simulasi botol untuk presentasi
+
+Buka **alamat-website/simulasi** → **Layar penuh** → **Mulai simulasi**. Kiri: botol tanpa pengawasan pecah. Kanan: sensor BIO-LOOP mengirim SIAGA, katup otomatis mengalirkan gas ke kompor. Bila Anda sudah masuk dan mencentang **Kirim ke Telegram**, peringatan contoh berlabel *DEMO* dikirim ke chat yang disetujui.
+
+## Bila asisten AI lambat
+
+Asisten memakai Gemini dengan tingkat berpikir rendah (`GEMINI_THINKING=auto`) dan otomatis pindah ke model cadangan (`GEMINI_FALLBACK_MODEL`) bila model utama lambat. Bila keduanya gagal, bot menjawab dari data BIO-LOOP (volume, biaya, keselamatan, pH, dll.) alih-alih menampilkan galat. Perintah `/volume`, `/biaya`, `/hitung 3000`, dan `/qna` tidak memakai AI sama sekali.

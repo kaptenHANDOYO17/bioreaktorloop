@@ -107,7 +107,7 @@ Tambahan opsional: `CRON_SECRET` (kata acak panjang), `SESSION_SECRET` (kata aca
 1. Buka `https://alamat-anda.vercel.app/admin.html`.
 2. Masuk dengan:
    - Nama pengguna: **Handoyo**
-   - Kata sandi: **12345**
+   - Kata sandi: isi dari `ADMIN_PASSWORD` di Vercel
 3. Sistem meminta Anda **mengganti kata sandi**. Pakai minimal 8 karakter, misalnya gabungan 3–4 kata: `kompor-biru-sayur-2045`.
 
 **Ingin beberapa akun mudah sekaligus, atau lupa kata sandi?** Di terminal VS Code (file `.env` berisi `DATABASE_URL` yang sama dengan di Vercel):
@@ -117,7 +117,7 @@ npm install
 npm run akun -- awal
 ```
 
-Perintah ini membuat/memulihkan `Handoyo/12345`, `admin/admin123` (admin), serta `petugas/petugas123`, `gizi/gizi123`, `guru/guru123` (pengguna). Rincian di **Menyelesaikan pemasangan** dan **Panduan admin**.
+Perintah ini membuat/memulihkan akun `Handoyo` & `admin` (admin) serta `petugas`, `gizi`, `guru` (pengguna) dengan **kata sandi acak yang dicetak di terminal**. Rincian di **Menyelesaikan pemasangan** dan **Panduan admin**.
 
 Keamanan bawaan: akun terkunci 10 menit setelah 5 kali salah kata sandi, dan semua kata sandi disimpan dalam bentuk hash (tidak bisa dibaca, bahkan oleh admin).
 
@@ -187,7 +187,7 @@ Untuk operasional resmi di banyak SPPG, pertimbangkan paket berbayar agar lebih 
 | "Database tidak bisa dihubungi: password authentication failed" | Password di connection string salah atau masih `[YOUR-PASSWORD]` |
 | "…getaddrinfo ENOTFOUND…" atau timeout | Anda memakai *Direct connection*. Ganti ke **Transaction pooler** port 6543 |
 | Proyek Supabase "Paused" | Buka dasbor Supabase → **Restore project**. Pasang cron GitHub (langkah 7) agar tidak terulang |
-| Tidak bisa masuk `Handoyo`/`12345` | Di terminal VS Code: `npm run akun -- sandi Handoyo 12345` (atau `npm run akun -- awal`). `.env` harus memakai `DATABASE_URL` yang sama dengan Vercel |
+| Tidak bisa masuk sebagai `Handoyo` | Di terminal VS Code: `npm run akun -- sandi Handoyo SandiBaruAnda` (atau `npm run akun -- awal`). `.env` harus memakai `DATABASE_URL` yang sama dengan Vercel |
 | "Akun dikunci 10 menit" | 5 kali salah kata sandi. Tunggu 10 menit |
 | Bot tidak membalas | Panel admin → Telegram → pastikan webhook **Terpasang** dan chat Anda **Disetujui** |
 | Webhook error "wrong response 401" | Webhook dipasang dengan alamat lama/preview. Klik **Pasang otomatis** di menu Telegram & notifikasi |

@@ -110,7 +110,7 @@ Bila berhasil, muncul tulisan:
 
 Buka browser ke **http://localhost:3000**. **Jangan tutup jendela hitam** itu selama sistem dipakai; menutupnya berarti mematikan server.
 
-Masuk ke panel admin di **http://localhost:3000/admin.html** dengan `Handoyo` / `12345`, lalu **segera ganti kata sandinya**.
+Masuk ke panel admin di **http://localhost:3000/admin.html** dengan `Handoyo` / kata sandi dari `ADMIN_PASSWORD`, lalu **segera ganti kata sandinya**.
 
 ## Langkah 7: Sambungkan Telegram
 
@@ -221,4 +221,4 @@ Rangkaian sensor dan relay dijelaskan di `ARSITEKTUR.md`.
 
 ## Menghapus data
 
-Tanpa `DATABASE_URL`, semua data tersimpan di folder `data/` (akun, keadaan reaktor, pembacaan, kejadian, perangkat, ingatan obrolan, chat Telegram). Untuk mulai bersih, matikan server lalu hapus file `.json` di folder itu. Akun admin `Handoyo` / `12345` dibuat lagi otomatis.
+Tanpa `DATABASE_URL`, semua data tersimpan di folder `data/` (akun, keadaan reaktor, pembacaan, kejadian, perangkat, ingatan obrolan, chat Telegram). Untuk mulai bersih, matikan server lalu hapus file `.json` di folder itu. Akun admin `Handoyo` dibuat lagi otomatis dengan kata sandi dari `ADMIN_PASSWORD`.

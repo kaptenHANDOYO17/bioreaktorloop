@@ -40,9 +40,9 @@ Hasilnya kira-kira:
 ```
 Database: PostgreSQL aws-0-ap-southeast-2.pooler.supabase.com (user postgres.xxxx)
 
-  Handoyo    / 12345        admin  diperbarui
-  admin      / admin123     admin  dibuat
-  petugas    / petugas123   user   dibuat
+  Handoyo    / (acak)       admin  diperbarui
+  admin      / (acak)       admin  dibuat
+  petugas    / (acak)       user   dibuat
   gizi       / gizi123      user   dibuat
   guru       / guru123      user   dibuat
 ```
@@ -83,7 +83,7 @@ Tidak memakai git? Buka repositori di github.com → **Add file → Upload files
 ## Langkah 5: Masuk ke website
 
 1. Buka `https://bioreaktorloop.vercel.app/admin.html`.
-2. Masuk: nama pengguna **Handoyo**, kata sandi **12345** (atau **admin** / **admin123**).
+2. Masuk: nama pengguna **Handoyo** dengan kata sandi dari `ADMIN_PASSWORD` (atau akun yang dicetak `npm run akun -- awal`).
 3. Panel admin terbuka di **Ringkasan**. Kartu paling atas **"Siap dipakai?"** menunjukkan apa saja yang masih kurang. Langkah-langkah berikut membereskannya satu per satu.
 
 Catatan: halaman panel admin memang kosong sebelum masuk. Isinya baru muncul setelah masuk dengan akun admin.
@@ -156,7 +156,7 @@ Lewat terminal: `npm run data -- isi`
 |---|---|
 | `npm run akun` menulis "berkas lokal" | File `.env` belum berisi `DATABASE_URL`. Salin dari Vercel |
 | Masuk ditolak walau sudah `npm run akun -- awal` | Database di `.env` berbeda dengan di Vercel (lihat Langkah 3) |
-| "Akun dikunci 10 menit" | Jalankan `npm run akun -- sandi Handoyo 12345` untuk membuka kunci |
+| "Akun dikunci 10 menit" | Jalankan `npm run akun -- sandi Handoyo SandiBaruAnda` untuk membuka kunci |
 | Website lama "Menyambungkan ke server" | Tunggu ±20 detik; halaman beralih sendiri. Pastikan deployment terbaru **Ready** di Vercel. Panel admin → **Cek koneksi** menunjukkan bagian yang bermasalah |
 | Bot tidak membalas | Panel admin → Telegram & notifikasi → **Pasang otomatis**, lalu pastikan chat Anda **Disetujui** |
 | Bot membalas "menunggu persetujuan" terus | Chat belum disetujui. Setujui di panel atau `npm run bot -- setujui <chat id>` |
