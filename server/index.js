@@ -19,6 +19,8 @@ const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; cha
 function serveStatic(req, res) {
   let rel = decodeURIComponent(new URL(req.url, 'http://x').pathname);
   if (rel.endsWith('/')) rel += 'index.html';
+  if (rel === '/admin') rel = '/admin.html';
+  if (rel === '/simulasi') rel = '/index.html';
   const p = path.normalize(path.join(PUBLIC, rel));
   if (!p.startsWith(PUBLIC)) { res.writeHead(403); return res.end('Forbidden'); }
   fs.stat(p, (err, st) => {
@@ -38,7 +40,8 @@ const server = http.createServer((req, res) => {
 server.listen(cfg.PORT, cfg.HOST, async () => {
   console.log('\n  MBG-BIOLOOP AI v' + router.VERSION);
   console.log(`  Website  : http://localhost:${cfg.PORT}`);
-  console.log(`  Admin    : http://localhost:${cfg.PORT}/admin.html`);
+  console.log(`  Admin    : http://localhost:${cfg.PORT}/admin`);
+  console.log(`  Simulasi : http://localhost:${cfg.PORT}/simulasi`);
   console.log(`  Database : ${db.kind === 'postgres' ? 'PostgreSQL' : 'berkas lokal di ' + cfg.DATA_DIR}`);
   console.log(`  Gemini   : ${cfg.GEMINI_API_KEY ? 'aktif, model ' + cfg.GEMINI_MODEL : 'BELUM diisi (GEMINI_API_KEY)'}`);
   console.log(`  Telegram : ${cfg.TELEGRAM_BOT_TOKEN ? 'mode ' + telegram.mode() : 'BELUM diisi (TELEGRAM_BOT_TOKEN)'}\n`);

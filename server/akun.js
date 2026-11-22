@@ -18,13 +18,16 @@ const cfg = require('../lib/config');
 const db = require('../lib/db');
 const auth = require('../lib/auth');
 
-/* Akun-akun mudah. Ubah daftar ini sesuai kebutuhan, lalu jalankan: npm run akun -- awal */
+/* Akun-akun awal. Kata sandinya dibuat ACAK setiap kali `npm run akun -- awal` dijalankan
+   dan dicetak sekali di terminal (repositori ini publik, jadi sandi tidak boleh ditulis di kode).
+   Ingin sandi tertentu? Pakai: npm run akun -- sandi <nama> <sandi baru> */
+const rnd = () => require('crypto').randomBytes(6).toString('base64url');
 const AKUN_AWAL = [
-  { username: 'Handoyo', password: '12345',      role: 'admin', name: 'Handoyo' },
-  { username: 'admin',   password: 'admin123',   role: 'admin', name: 'Admin SPPG' },
-  { username: 'petugas', password: 'petugas123', role: 'user',  name: 'Petugas Dapur' },
-  { username: 'gizi',    password: 'gizi123',    role: 'user',  name: 'Ahli Gizi' },
-  { username: 'guru',    password: 'guru123',    role: 'user',  name: 'Guru Pendamping' }
+  { username: 'Handoyo', password: rnd(), role: 'admin', name: 'Handoyo' },
+  { username: 'admin',   password: rnd(), role: 'admin', name: 'Admin SPPG' },
+  { username: 'petugas', password: rnd(), role: 'user',  name: 'Petugas Dapur' },
+  { username: 'gizi',    password: rnd(), role: 'user',  name: 'Ahli Gizi' },
+  { username: 'guru',    password: rnd(), role: 'user',  name: 'Guru Pendamping' }
 ];
 
 const pad = (s, n) => String(s == null ? '' : s).padEnd(n).slice(0, n);
@@ -109,7 +112,7 @@ ${AKUN_AWAL.map(x => `                                                    ${pad(
   npm run akun -- nonaktifkan <nama>
   npm run akun -- hapus <nama>
 
-Contoh:  npm run akun -- sandi Handoyo 12345`);
+Contoh:  npm run akun -- sandi Handoyo SandiBaruAnda`);
   }
 }
 main().then(async () => { try { await db.close(); } catch (e) { /* abaikan */ } process.exit(0); })
