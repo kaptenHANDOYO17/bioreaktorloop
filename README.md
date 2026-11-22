@@ -2,6 +2,8 @@
 
 Sisa makan siang program **Makan Bergizi Gratis** diolah bioreaktor floating drum ±500 L menjadi **biogas untuk kompor dapur SPPG** dan **pupuk organik**. Sensor IoT menjaga reaktor, AI membaca pola sisa makanan, dan **bot Telegram + asisten Gemini** mengabari serta menjawab pertanyaan petugas. Asisten **mengingat obrolan sebelumnya**.
 
+**Versi 3.3**: simulasi analogi botol (`/simulasi`) untuk presentasi, perhitungan volume & biaya satu SPPG yang sama di website/bot/Excel, perintah bot `/volume` `/biaya` `/hitung` `/qna`, jawaban cepat saat Gemini lambat, dan notifikasi Telegram saat ada pendaftaran akun.
+
 **Versi 3**: siap deploy ke **Vercel** dari **GitHub**, database **Supabase/Neon (PostgreSQL)**, akun **pengguna & admin**, laporan lengkap yang bisa diunduh, dan manajemen perangkat ESP32.
 
 ## Fitur
@@ -21,7 +23,7 @@ Sisa makan siang program **Makan Bergizi Gratis** diolah bioreaktor floating dru
 2. Buat proyek **Supabase** → *Connect* → salin connection string **Transaction pooler** (port 6543).
 3. Di **Vercel** → *Add New Project* → impor repositori → isi Environment Variables `DATABASE_URL`, `TELEGRAM_BOT_TOKEN`, `GEMINI_API_KEY`, `SITE_NAME` → **Deploy**.
 4. Di terminal VS Code: `npm install`, `npm run akun -- awal` (membuat akun mudah di database yang sama).
-5. Buka `https://proyek-anda.vercel.app/admin.html`, masuk **Handoyo / 12345** atau **admin / admin123**. Webhook Telegram terpasang otomatis; setujui chat Anda di menu *Telegram & notifikasi*.
+5. Buka `https://proyek-anda.vercel.app/admin`, masuk dengan akun admin dari `ADMIN_USERNAME` / `ADMIN_PASSWORD` (atau akun yang dicetak `npm run akun -- awal`), lalu **segera ganti kata sandinya**. Webhook Telegram terpasang otomatis; setujui chat Anda di menu *Telegram & notifikasi*.
 6. Pasang cron tiap 5 menit (cron-job.org atau secret `BIOLOOP_URL` di GitHub).
 
 Langkah demi langkah untuk orang awam: [public/docs/PANDUAN_DEPLOY_VERCEL.md](public/docs/PANDUAN_DEPLOY_VERCEL.md).
@@ -59,7 +61,7 @@ mbg-bioloop/
 
 ## Catatan penting
 
-- **Akun mudah** (`Handoyo/12345`, `admin/admin123`, `petugas/petugas123`, `gizi/gizi123`, `guru/guru123`) bersifat sementara. Ganti kata sandinya sebelum website dibagikan.
+- **Akun awal** (`Handoyo`, `admin`, `petugas`, `gizi`, `guru`) dibuat `npm run akun -- awal` dengan kata sandi acak yang dicetak sekali di terminal. Repositori ini publik: jangan menulis kata sandi di kode atau dokumen.
 - Jangan unggah file `.env`. Token Telegram, kunci Gemini, dan `DATABASE_URL` hanya disimpan di Environment Variables.
 - Tingkat gratis Gemini: data dapat dipakai Google untuk pengembangan produk; jangan memasukkan data pribadi siswa.
 - Angka mode simulasi berasal dari model literatur, bukan hasil kalibrasi alat. Desain digester akhir perlu uji potensi metana (BMP) sisa pangan setempat.
